@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Notebound — study checklist</title>
+<title>Notebound — Go Backend Engineer Roadmap</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
 
@@ -15,12 +15,12 @@
   --rule: #C9C1A8;
   --card-bg: rgba(255,255,255,0.55);
   --card-shadow: 0 2px 12px rgba(46,42,36,0.10), 0 1px 3px rgba(46,42,36,0.08);
-  --card-hover-shadow: 0 6px 24px rgba(46,42,36,0.15), 0 2px 6px rgba(46,42,36,0.10);
+  --sidebar-w: 280px;
 }
 
-*{box-sizing:border-box;}
+*{box-sizing:border-box; margin:0; padding:0;}
+
 body{
-  margin:0;
   background:var(--paper);
   background-image:
     repeating-linear-gradient(0deg, transparent, transparent 36px, var(--rule) 36px, var(--rule) 37px),
@@ -29,202 +29,417 @@ body{
   color:var(--graphite);
   font-family:'Comfortaa', cursive;
   min-height:100vh;
+  display:flex;
 }
 
+/* ── Margin line ── */
 .margin-line{
   position:fixed; top:0; bottom:0; left:56px; width:2px;
-  background:rgba(196,69,58,0.3);
+  background:rgba(196,69,58,0.3); z-index:10;
 }
 
-.wrap{max-width:960px;margin:0 auto;padding:56px 36px 90px 96px;}
+/* ── Sidebar ── */
+.sidebar{
+  position:fixed; top:0; left:0; bottom:0;
+  width:var(--sidebar-w);
+  background:rgba(233,226,206,0.92);
+  backdrop-filter:blur(12px);
+  border-right:1px solid var(--rule);
+  overflow-y:auto;
+  z-index:20;
+  display:flex; flex-direction:column;
+  scrollbar-width:thin;
+  scrollbar-color:var(--rule) transparent;
+}
 
-.eyebrow{
+.sidebar-header{
+  padding:28px 22px 18px;
+  border-bottom:1px solid var(--rule);
+  flex-shrink:0;
+}
+.sidebar-header h2{
+  font-size:20px; font-weight:700; margin:0;
+  transform:rotate(-0.5deg);
+}
+.sidebar-header .subtitle{
+  font-size:12px; color:var(--sepia); margin-top:4px;
+}
+
+.sidebar-links{
+  display:flex; gap:8px; margin-top:12px;
+}
+.sidebar-links a{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; color:var(--sepia); text-decoration:none;
+  padding:4px 10px; border-radius:6px;
+  background:rgba(139,115,85,0.06);
+  border:1px solid rgba(46,42,36,0.08);
+  transition:all 0.15s ease;
+  font-family:'Comfortaa',cursive;
+}
+.sidebar-links a:hover{
+  color:var(--red-pen); background:rgba(179,58,48,0.06);
+  border-color:var(--red-pen);
+}
+.sidebar-links a svg{width:12px; height:12px;}
+
+/* progress bar in sidebar header */
+.sidebar-progress-wrap{
+  margin-top:12px;
+}
+.sidebar-progress-bar{
+  width:100%; height:6px; background:var(--paper-dark);
+  border-radius:3px; overflow:hidden;
+}
+.sidebar-progress-fill{
+  height:100%; background:var(--red-pen);
+  border-radius:3px; transition:width 0.3s ease;
+}
+.sidebar-progress-text{
+  font-size:11px; color:var(--sepia); margin-top:4px;
+}
+
+.sidebar-nav{
+  flex:1; padding:12px 0;
+}
+
+.level-group{margin-bottom:2px;}
+
+.level-btn{
+  display:flex; align-items:center; justify-content:space-between;
+  width:100%; border:none; background:none; cursor:pointer;
+  font-family:'Comfortaa',cursive; font-size:12px; font-weight:700;
+  color:var(--sepia); padding:8px 18px;
+  text-align:left; transition:all 0.15s ease;
+  letter-spacing:0.3px;
+}
+.level-btn:hover{background:rgba(139,115,85,0.08); color:var(--graphite);}
+.level-btn.active{color:var(--red-pen); background:rgba(179,58,48,0.06);}
+.level-btn .chevron{
+  font-size:10px; transition:transform 0.15s ease;
+}
+.level-group.open .level-btn .chevron{transform:rotate(90deg);}
+
+.level-items{
+  max-height:0; overflow:hidden; transition:max-height 0.25s ease;
+}
+.level-group.open .level-items{max-height:2000px;}
+
+.nav-item{
+  display:flex; align-items:center; justify-content:space-between;
+  width:100%;
+  border:none; background:none; cursor:pointer;
+  font-family:'Comfortaa',cursive; font-size:11px;
+  color:var(--graphite); padding:5px 18px 5px 32px;
+  text-align:left; transition:all 0.15s ease;
+  text-decoration:none;
+  border-left:3px solid transparent;
+}
+.nav-item:hover{
+  background:rgba(139,115,85,0.06);
+  border-left-color:var(--rule);
+}
+.nav-item.active{
+  color:var(--red-pen); font-weight:600;
+  background:rgba(179,58,48,0.05);
+  border-left-color:var(--red-pen);
+}
+
+.nav-count{
+  font-size:9px; color:var(--sepia);
+  background:var(--paper-dark); padding:1px 5px;
+  border-radius:8px; font-weight:600;
+  flex-shrink:0;
+}
+.nav-count.complete{background:rgba(179,58,48,0.12); color:var(--red-pen);}
+
+/* ── Main content ── */
+.main{
+  margin-left:var(--sidebar-w);
+  flex:1; padding:36px 44px 80px 72px;
+  max-width:900px;
+}
+
+.main-header{
+  margin-bottom:32px;
+}
+.main-header .eyebrow{
   font-size:14px; color:var(--sepia); letter-spacing:1px;
   transform:rotate(-1deg); display:inline-block; margin-bottom:4px;
 }
-
-h1{
-  font-family:'Comfortaa', cursive; font-weight:700;
-  font-size:46px; line-height:1.05; margin:0 0 8px 0;
+.main-header h1{
+  font-family:'Comfortaa',cursive; font-weight:700;
+  font-size:36px; line-height:1.1; margin:0 0 6px;
 }
-.underline-scribble{position:relative; display:inline-block;}
-.underline-scribble svg{position:absolute; left:0; bottom:-8px; width:100%; height:14px;}
-
-.overall{
-  font-size:16px; color:var(--sepia); margin:0 0 40px 0; transform:rotate(-0.4deg);
+.main-header .underline-scribble{position:relative; display:inline-block;}
+.main-header .underline-scribble svg{position:absolute; left:0; bottom:-6px; width:100%; height:12px;}
+.main-header .stats{
+  font-size:14px; color:var(--sepia); margin-top:8px;
 }
-.overall b{color:var(--graphite);}
+.main-header .stats b{color:var(--graphite);}
 
-.section{
-  margin-bottom:14px;
-  background:var(--card-bg);
-  border:1px solid rgba(46,42,36,0.10);
-  border-radius:12px;
-  box-shadow:var(--card-shadow);
-  transition:box-shadow 0.2s ease, transform 0.2s ease;
-  overflow:hidden;
-}
-.section:hover{
-  box-shadow:var(--card-hover-shadow);
-  transform:translateY(-2px);
+/* ── Section cards (chapters) ── */
+.section-card{
+  margin-bottom:16px;
+  scroll-margin-top:24px;
 }
 
 .section-head{
   display:flex; align-items:center; justify-content:space-between;
-  padding:18px 20px; cursor:pointer; background:none; border:none; width:100%;
-  font-family:'Comfortaa', cursive; font-size:23px; color:var(--graphite);
-  text-align:left; transition:background 0.15s ease;
+  padding:14px 18px; cursor:pointer; background:var(--card-bg);
+  border:1px solid rgba(46,42,36,0.10);
+  border-radius:10px;
+  box-shadow:var(--card-shadow);
+  font-family:'Comfortaa',cursive; font-size:17px; color:var(--graphite);
+  text-align:left; transition:all 0.2s ease;
+  width:100%; border-bottom:none;
+  user-select:none;
+}
+.section-card.open .section-head{
+  border-radius:10px 10px 0 0;
+  border-bottom:1px solid rgba(46,42,36,0.08);
 }
 .section-head:hover{
-  background:rgba(139,115,85,0.06);
+  box-shadow:0 6px 24px rgba(46,42,36,0.13), 0 2px 6px rgba(46,42,36,0.08);
+  transform:translateY(-1px);
 }
-.section-head:focus-visible{outline:2px dashed var(--red-pen); outline-offset:3px;}
 
 .section-title{display:flex; align-items:center; gap:10px;}
 .tab{
   display:inline-block; background:var(--paper-dark); border:1px solid rgba(46,42,36,0.18);
-  font-size:13px; font-family:'Comfortaa',cursive; color:var(--graphite);
-  padding:3px 10px; transform:rotate(-2deg); border-radius:4px;
+  font-size:12px; font-family:'Comfortaa',cursive; color:var(--graphite);
+  padding:2px 9px; transform:rotate(-2deg); border-radius:4px;
+  flex-shrink:0;
 }
+.section-title-text{font-weight:600; font-size:16px;}
 
-.section-progress{font-size:15px; color:var(--graphite); white-space:nowrap; font-weight:600;}
+.section-meta{display:flex; align-items:center; gap:10px;}
+.section-resource-link{
+  display:inline-flex; align-items:center; gap:4px;
+  font-family:'Comfortaa',cursive; font-size:11px; font-weight:600;
+  color:var(--sepia); text-decoration:none;
+  padding:3px 10px; border-radius:5px;
+  background:rgba(139,115,85,0.06);
+  border:1px solid rgba(46,42,36,0.10);
+  transition:all 0.15s ease;
+  white-space:nowrap;
+}
+.section-resource-link:hover{
+  color:var(--red-pen); background:rgba(179,58,48,0.06);
+  border-color:rgba(179,58,48,0.25);
+  transform:translateY(-1px);
+}
+.section-resource-link svg{width:12px; height:12px;}
+.section-progress{font-size:13px; color:var(--sepia); white-space:nowrap; font-weight:600;}
 .section-progress.complete{color:var(--red-pen);}
+.s-chevron{transition:transform 0.15s ease; color:var(--sepia); font-size:14px;}
+.section-card.open .s-chevron{transform:rotate(90deg);}
 
-.chevron{transition:transform 0.15s ease; margin-left:12px; color:var(--sepia); font-size:16px;}
-.section.open .chevron{transform:rotate(90deg);}
-
-.topics{
-  max-height:0; overflow:hidden; transition:max-height 0.25s ease;
-  padding-left:20px; padding-right:16px;
+.section-body{
+  max-height:0; overflow:hidden; transition:max-height 0.3s ease;
+  background:var(--card-bg);
+  border:1px solid rgba(46,42,36,0.10);
+  border-top:none;
+  border-radius:0 0 10px 10px;
+  box-shadow:0 2px 12px rgba(46,42,36,0.06);
 }
-.section.open .topics{max-height:5000px;}
+.section-card.open .section-body{max-height:30000px;}
 
-.topic{margin:6px 0 18px 10px;}
+.section-body-inner{
+  padding:14px 18px 20px;
+}
+
+/* ── Topic groups inside a section ── */
+.topic-block{
+  margin-bottom:16px;
+  scroll-margin-top:20px;
+}
+.topic-block:last-child{margin-bottom:0;}
+
 .topic-title{
-  font-size:17px; color:var(--graphite); font-weight:600; margin:0 0 8px 2px; transform:rotate(-0.3deg);
+  font-size:14px; font-weight:700; color:var(--graphite);
+  margin:0 0 8px 0; transform:rotate(-0.3deg);
+  display:flex; align-items:center; gap:8px;
+}
+.topic-title svg{width:15px; height:15px; color:var(--red-pen); flex-shrink:0;}
+
+/* ── Items: compact copyable tags ── */
+.items-wrap{
+  display:flex; flex-wrap:wrap; gap:6px;
 }
 
-ul.item-list{
-  list-style:none; margin:0; padding:0;
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-  gap:4px 24px;
+.item-tag{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px;
+  background:rgba(255,255,255,0.6);
+  border:1px solid rgba(46,42,36,0.10);
+  border-radius:6px;
+  font-size:13px; color:var(--graphite);
+  cursor:pointer;
+  transition:all 0.15s ease;
+  line-height:1.3;
+  user-select:none;
+  position:relative;
 }
-li.item{
-  display:flex; align-items:flex-start; gap:12px;
-  padding:7px 2px; font-size:17px; color:var(--graphite);
+.item-tag:hover{
+  background:var(--paper-dark);
+  border-color:rgba(179,58,48,0.25);
+  transform:translateY(-1px);
+  box-shadow:0 2px 8px rgba(46,42,36,0.08);
+}
+.item-tag.done{
+  background:rgba(179,58,48,0.04);
+  border-color:rgba(179,58,48,0.15);
+}
+.item-tag.done .item-label{
+  color:var(--sepia);
+  text-decoration:line-through;
+  text-decoration-color:var(--red-pen);
+  text-decoration-thickness:2px;
 }
 
-.check-box{
-  width:19px; height:19px; border:2.5px solid var(--graphite);
-  flex-shrink:0; margin-top:2px; position:relative; cursor:pointer;
-  background:none; padding:0; border-radius:1px;
+.item-check{
+  width:14px; height:14px; border:2px solid var(--graphite);
+  flex-shrink:0; position:relative; border-radius:2px;
+  transition:all 0.15s ease;
 }
-.check-box.done::after{
-  content:''; position:absolute; left:1px; top:6px; width:12px; height:6px;
-  border-left:3px solid var(--red-pen); border-bottom:3px solid var(--red-pen);
+.item-tag.done .item-check{
+  border-color:var(--red-pen);
+  background:rgba(179,58,48,0.08);
+}
+.item-tag.done .item-check::after{
+  content:''; position:absolute; left:1px; top:4px; width:8px; height:4px;
+  border-left:2px solid var(--red-pen); border-bottom:2px solid var(--red-pen);
   transform:rotate(-45deg);
 }
 
-.item-text{cursor:pointer; line-height:1.4; color:var(--graphite);}
-.item-text.done{color:var(--sepia); position:relative;}
-.item-text.done::after{
-  content:''; position:absolute; left:0; top:50%; width:100%; height:2px;
-  background:var(--red-pen); transform:translateY(-50%) rotate(-0.6deg);
+.item-label{
+  font-size:13px; color:var(--graphite);
+  transition:color 0.15s;
 }
 
-/* Resource links */
-.resources-block{
-  margin:10px 10px 18px 10px;
-  padding:14px 18px;
-  background:rgba(92,74,50,0.05);
-  border-left:3px solid var(--red-pen);
-  border-radius:0 8px 8px 0;
+/* Copy button on item */
+.item-copy{
+  display:none; /* shown on hover */
+  width:14px; height:14px; flex-shrink:0;
+  color:var(--sepia); opacity:0.6;
+  transition:opacity 0.15s, color 0.15s;
+  cursor:pointer;
 }
-.resources-heading{
-  font-size:14px; font-weight:700; color:var(--red-pen);
-  letter-spacing:0.5px; margin:0 0 10px 0;
-  display:flex; align-items:center; gap:6px;
+.item-tag:hover .item-copy{display:block;}
+.item-copy:hover{opacity:1; color:var(--red-pen);}
+
+/* Copy toast */
+.copy-toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--graphite); color:var(--paper);
+  padding:8px 20px; border-radius:8px; font-size:13px;
+  font-family:'Comfortaa',cursive;
+  box-shadow:0 4px 20px rgba(0,0,0,0.25);
+  opacity:0; transition:all 0.25s ease;
+  z-index:100; pointer-events:none;
 }
-.resources-heading svg{width:16px; height:16px; flex-shrink:0;}
-.resource-group-title{
-  font-size:13px; font-weight:600; color:var(--sepia);
-  margin:10px 0 4px 0; transform:rotate(-0.3deg);
-}
-.resource-group-title:first-child{margin-top:0;}
-.resource-links{
-  display:flex; flex-wrap:wrap; gap:6px 8px; margin:0; padding:0; list-style:none;
-}
-.resource-link{
-  display:inline-flex; align-items:center; gap:5px;
-  padding:4px 12px; font-size:13px; font-family:'Comfortaa',cursive;
-  color:var(--graphite); background:rgba(255,255,255,0.7);
-  border:1px solid rgba(46,42,36,0.14); border-radius:20px;
-  text-decoration:none; transition:all 0.15s ease;
-  line-height:1.4;
-}
-.resource-link:hover{
-  background:var(--paper-dark); border-color:var(--red-pen);
-  color:var(--red-pen); transform:translateY(-1px);
-  box-shadow:0 2px 8px rgba(179,58,48,0.10);
-}
-.resource-link svg{
-  width:12px; height:12px; flex-shrink:0; opacity:0.5;
-  transition:opacity 0.15s ease;
-}
-.resource-link:hover svg{opacity:1;}
-.resource-link .book-tag{
-  font-size:10px; background:var(--red-pen); color:#fff;
-  padding:1px 5px; border-radius:3px; font-weight:600;
+.copy-toast.show{
+  opacity:1; transform:translateX(-50%) translateY(0);
 }
 
-@media (max-width:600px){
-  .wrap{padding:40px 18px 60px 52px;}
-  .margin-line{left:24px;}
-  h1{font-size:34px;}
-  .section-head{font-size:19px;}
-  ul.item-list{grid-template-columns:1fr;}
-  .resources-block{margin:10px 4px 14px 4px; padding:10px 12px;}
+/* ── Divider ── */
+.level-divider{
+  border:none; border-top:1px dashed var(--rule);
+  margin:28px 0;
+}
+
+/* ── Mobile ── */
+@media (max-width:768px){
+  .sidebar{
+    position:relative; width:100%;
+    border-right:none; border-bottom:1px solid var(--rule);
+    max-height:none;
+  }
+  .main{
+    margin-left:0; padding:24px 18px 60px;
+  }
+  body{flex-direction:column;}
+  .margin-line{display:none;}
+
+  .sidebar.collapsed .sidebar-nav{display:none;}
+  .sidebar-toggle{
+    display:flex; align-items:center; gap:6px;
+    border:none; background:none; cursor:pointer;
+    font-family:'Comfortaa',cursive; font-size:12px;
+    color:var(--sepia); padding:8px 22px;
+    border-top:1px solid var(--rule);
+    width:100%;
+  }
+  .section-head{font-size:15px;}
+  .item-tag{font-size:12px; padding:4px 10px;}
+}
+@media (min-width:769px){
+  .sidebar-toggle{display:none;}
 }
 </style>
 </head>
 <body>
 <div class="margin-line"></div>
-<div class="wrap">
 
-  <span class="eyebrow">the syllabus, kept the way you'd keep it on paper</span>
-  <h1>
-    <span class="underline-scribble">
-      Study checklist
-      <svg viewBox="0 0 260 14" preserveAspectRatio="none"><path d="M2,8 Q60,2 130,8 T258,7" stroke="#C4453A" stroke-width="3" fill="none"/></svg>
-    </span>
-  </h1>
-  <p class="overall" id="overall"></p>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>🗺️ Roadmap</h2>
+    <p class="subtitle" id="sidebar-stats"></p>
+    <div class="sidebar-links">
+      <a href="resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Resources
+      </a>
+    </div>
+    <div class="sidebar-progress-wrap">
+      <div class="sidebar-progress-bar"><div class="sidebar-progress-fill" id="progress-fill"></div></div>
+      <p class="sidebar-progress-text" id="progress-text"></p>
+    </div>
+  </div>
+  <nav class="sidebar-nav" id="sidebar-nav"></nav>
+  <button class="sidebar-toggle" id="sidebar-toggle">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    Toggle chapters
+  </button>
+</aside>
 
-  <div id="sections"></div>
+<main class="main" id="main-content">
+  <div class="main-header">
+    <span class="eyebrow">senior software engineer · go backend · 2025 roadmap</span>
+    <h1>
+      <span class="underline-scribble">
+        Go Backend Roadmap
+        <svg viewBox="0 0 260 12" preserveAspectRatio="none"><path d="M2,7 Q60,2 130,7 T258,6" stroke="#C4453A" stroke-width="3" fill="none"/></svg>
+      </span>
+    </h1>
+    <p class="stats" id="main-stats"></p>
+  </div>
+  <div id="content"></div>
+</main>
 
-</div>
+<div class="copy-toast" id="copy-toast">Copied!</div>
 
 <script>
 (function(){
-  // Fixed structure: sections -> topics -> items. Edit this data to match your real syllabus.
+
   const data = [
     {
       id: 's1',
       title: '1 — Go Programming Language',
       topics: [
-        { title: 'Core Go', items: ['Variables and constants','Primitive data types','Arrays','Slices','Maps','Structs','Methods','Pointers','Functions','Multiple return values','Variadic functions','Closures','Defer','Panic','Recover','Interfaces','Composition','Embedding','Type assertions','Type switches','Generics','Reflection'] },
-        { title: 'Go Error Handling', items: ['error interface','errors.New','fmt.Errorf','%w error wrapping','errors.Is','errors.As','Custom errors','Error handling strategies','Error propagation','Sentinel errors','Error design in APIs'] },
+        { title: 'Core Go', items: ['Variables and constants','Primitive data types','Strings and runes','Arrays','Slices','Maps','Structs','Methods','Pointers','Functions','Multiple return values','Variadic functions','Closures','init function','blank identifier','iota','Defer','Panic','Recover','Interfaces','Composition','Embedding','Type assertions','Type switches','Generics','Reflection'] },
+        { title: 'Go Error Handling', items: ['error interface','errors.New','fmt.Errorf','%w error wrapping','errors.Is','errors.As','Custom errors','panic vs error','Error handling strategies','Error propagation','Sentinel errors','Error design in APIs'] },
         { title: 'Go Concurrency', items: ['Goroutines','Channels','Buffered channels','Unbuffered channels','Directional channels','select','Channel closing','Worker pools','Fan-in','Fan-out','Pipelines','sync.Mutex','sync.RWMutex','sync.WaitGroup','sync.Once','sync.Cond','sync.Pool','sync/atomic','Atomic operations','Race conditions','Deadlocks','Livelocks','Starvation','Go Memory Model','Race detector'] },
         { title: 'Go Runtime and Internals', items: ['Goroutine scheduler','GMP model','Stack growth','Heap vs stack','Escape analysis','Garbage collection','Garbage collector tuning','Memory allocation','Object lifetime','Runtime package','CPU profiling','Memory profiling','Goroutine profiling'] },
-        { title: 'Go Project and Tooling', items: ['Go modules','go.mod','go.sum','Dependency management','Semantic versioning','Build tags','Cross compilation','go build','go run','go test','go vet','go fmt','go generate','go install','go list','go env','pprof','Go benchmarks','golangci-lint','staticcheck','Delve debugger'] }
+        { title: 'Go Project and Tooling', items: ['Go modules','go.mod','go.sum','go work','Dependency management','Semantic versioning','Build tags','Cross compilation','go build','go run','go test','go vet','go fmt','go generate','go install','pprof','Go benchmarks','golangci-lint','staticcheck','Delve debugger'] }
       ]
     },
     {
       id: 's2',
       title: '2 — Go Standard Library',
       topics: [
-        { title: 'Standard Library', items: ['net/http','context','database/sql','encoding/json','encoding/xml','os','io','bufio','bytes','strings','strconv','time','sync','sync/atomic','errors','log/slog','crypto','crypto/tls','crypto/sha256','crypto/rand','net','os/signal','syscall','reflect','runtime','testing'] }
+        { title: 'Standard Library', items: ['fmt','net/http','context','database/sql','encoding/json','encoding/xml','os','io','bufio','bytes','strings','strconv','sort','regexp','time','sync','sync/atomic','errors','log/slog','crypto','crypto/tls','crypto/sha256','crypto/rand','net','os/signal','syscall','reflect','runtime','testing','embed','flag','text/template','path/filepath'] }
       ]
     },
     {
@@ -240,7 +455,7 @@ li.item{
       id: 's4',
       title: '4 — Computer Science Fundamentals',
       topics: [
-        { title: 'Operating Systems', items: ['Processes','Threads','Goroutines vs Threads','Context Switching','CPU Scheduling','Memory Management','Virtual Memory','Paging','Page Faults','Stack','Heap','File Descriptors','System Calls','Signals','Inter-Process Communication','Pipes','Shared Memory','Semaphores','Mutexes','Deadlocks'] },
+        { title: 'Operating Systems', items: ['Processes','Threads','Goroutines vs Threads','Context Switching','CPU Scheduling','Memory Management','Virtual Memory','Paging','Page Faults','Stack','Heap','File Descriptors','System Calls','Signals','Epoll','I/O multiplexing','Inter-Process Communication','Pipes','Shared Memory','Semaphores','Mutexes','Deadlocks'] },
         { title: 'Linux', items: ['Linux filesystem','File permissions','Users and groups','Processes','Services','Environment variables','Shell scripting','Bash','systemctl','journalctl','ps','top','htop','lsof','strace','vmstat','iostat','df','du','free','ss','netstat','kill','grep','awk','sed','find','xargs'] }
       ]
     },
@@ -251,23 +466,23 @@ li.item{
         { title: 'Networking Fundamentals', items: ['OSI Model','TCP/IP Model','IP Addresses','IPv4','IPv6','Subnetting','CIDR','MAC Addresses','ARP','NAT','Firewalls','Ports','Sockets'] },
         { title: 'TCP', items: ['TCP Handshake','TCP Connection Termination','TCP Flow Control','TCP Congestion Control','TCP Retransmission','TCP Keepalive','TCP Connection Pooling'] },
         { title: 'UDP', items: ['UDP Characteristics','UDP vs TCP','Use Cases'] },
-        { title: 'DNS', items: ['DNS Resolution','DNS Records','A Record','AAAA Record','CNAME','MX','TXT','NS','DNS Caching','DNS TTL'] },
+        { title: 'DNS', items: ['DNS Resolution','DNS Records','A Record','AAAA Record','CNAME','MX','TXT','NS','PTR Record','DNS Caching','DNS TTL'] },
         { title: 'TLS', items: ['TLS Handshake','Certificates','Certificate Authorities','Public Key Cryptography','Symmetric Encryption','HTTPS','TLS Termination'] },
-        { title: 'Networking Tools', items: ['curl','ping','dig','nslookup','traceroute','ss','netstat','Wireshark'] }
+        { title: 'Networking Tools', items: ['curl','ping','dig','nslookup','traceroute','Wireshark'] }
       ]
     },
     {
       id: 's6',
       title: '6 — HTTP',
       topics: [
-        { title: 'HTTP', items: ['HTTP Request','HTTP Response','HTTP Methods','HTTP Status Codes','HTTP Headers','HTTP Cookies','HTTP Sessions','HTTP Keep-Alive','HTTP Connection Pooling','HTTP Compression','HTTP Streaming','HTTP/1.0','HTTP/1.1','HTTP/2','HTTP/3','QUIC','CORS','CSRF','HTTP Caching','Cache-Control','ETag','Last-Modified','Conditional Requests','Content Negotiation','Multipart Requests','Server-Sent Events'] }
+        { title: 'HTTP', items: ['HTTP Request','HTTP Response','HTTP Methods','HTTP Status Codes','HTTP Headers','HTTP Cookies','HTTP Sessions','HTTP Keep-Alive','HTTP Connection Pooling','HTTP Compression','HTTP Streaming','HTTP/1.0','HTTP/1.1','HTTP/2','HTTP/3','QUIC','HTTP Caching','Cache-Control','ETag','Last-Modified','Conditional Requests','Content Negotiation','Multipart Requests'] }
       ]
     },
     {
       id: 's7',
       title: '7 — API Development',
       topics: [
-        { title: 'REST API', items: ['REST Principles','Resource Design','HTTP Methods','Idempotency','Pagination','Cursor Pagination','Offset Pagination','Filtering','Sorting','Searching','API Versioning','Error Response Design','Rate Limiting','Request Validation','Response Validation','API Documentation','OpenAPI','Swagger'] },
+        { title: 'REST API', items: ['REST Principles','Resource Design','Idempotency','HATEOAS','Pagination','Cursor Pagination','Offset Pagination','Filtering','Sorting','Searching','API Versioning','Error Response Design','Rate Limiting','Token Bucket','Sliding Window Rate Limiting','Request Validation','Response Validation','API Documentation','OpenAPI','Swagger'] },
         { title: 'gRPC', items: ['Protocol Buffers','Unary RPC','Server Streaming','Client Streaming','Bidirectional Streaming','Deadlines','Timeouts','Cancellation','Interceptors','Metadata','Error Handling','gRPC Health Checking','gRPC Load Balancing'] },
         { title: 'Other API Technologies', items: ['GraphQL','WebSockets','Server-Sent Events','Webhooks','Long Polling'] }
       ]
@@ -276,9 +491,9 @@ li.item{
       id: 's8',
       title: '8 — PostgreSQL',
       topics: [
-        { title: 'SQL', items: ['SELECT','INSERT','UPDATE','DELETE','WHERE','ORDER BY','GROUP BY','HAVING','JOIN','INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL JOIN','CROSS JOIN','Subqueries','CTEs','Window Functions','Aggregation','UNION','INTERSECT','EXCEPT'] },
+        { title: 'SQL', items: ['SELECT','INSERT','UPDATE','DELETE','WHERE','ORDER BY','GROUP BY','HAVING','JOIN','INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL JOIN','CROSS JOIN','Subqueries','CTEs','Window Functions','Aggregation','UNION','INTERSECT','EXCEPT','RETURNING','JSONB','Views','Triggers'] },
         { title: 'Database Design', items: ['Primary Keys','Foreign Keys','Unique Constraints','Check Constraints','Not Null Constraints','Natural Keys','Surrogate Keys','Normalization','Denormalization','1NF','2NF','3NF','BCNF'] },
-        { title: 'Indexes', items: ['B-Tree Index','Hash Index','GIN Index','GiST Index','BRIN Index','Composite Index','Partial Index','Covering Index','Index Selectivity','Index Scan','Sequential Scan'] },
+        { title: 'Indexes', items: ['B-Tree Index','Hash Index','GIN Index','GiST Index','BRIN Index','Composite Index','Partial Index','Covering Index','Expression Index','Unique Index','Index Selectivity','Index Scan','Sequential Scan'] },
         { title: 'Transactions', items: ['ACID','Atomicity','Consistency','Isolation','Durability','Read Uncommitted','Read Committed','Repeatable Read','Serializable','MVCC','Row Locks','Table Locks','Deadlocks','Optimistic Locking','Pessimistic Locking'] },
         { title: 'Performance', items: ['EXPLAIN','EXPLAIN ANALYZE','Query Optimization','Slow Queries','Connection Pooling','PgBouncer','N+1 Query Problem','Database Partitioning','Table Partitioning','Read Replicas','Streaming Replication','Database Backups','Database Recovery'] },
         { title: 'Go PostgreSQL Stack', items: ['pgx','database/sql','sqlc','GORM','Goose','Atlas','Flyway'] }
@@ -288,22 +503,22 @@ li.item{
       id: 's9',
       title: '9 — Redis',
       topics: [
-        { title: 'Redis', items: ['Redis Strings','Redis Lists','Redis Sets','Redis Sorted Sets','Redis Hashes','Redis Streams','Redis Pub/Sub','Redis Transactions','Redis Pipelines','Redis Lua Scripts','Redis TTL','Redis Expiration','Redis Eviction Policies','Redis Persistence','RDB','AOF','Redis Replication','Redis Sentinel','Redis Cluster','Distributed Locks','Rate Limiting','Session Storage','Cache'] }
+        { title: 'Redis', items: ['Redis Strings','Redis Lists','Redis Sets','Redis Sorted Sets','Redis Hashes','Redis Streams','Redis Pub/Sub','Redis Transactions','Redis Pipelines','Redis Lua Scripts','Redis TTL','Redis Expiration','Redis Eviction Policies','Redis Persistence','RDB','AOF','Redis Replication','Redis Sentinel','Redis Cluster','Distributed Locks','HyperLogLog','Geospatial','Cache'] }
       ]
     },
     {
       id: 's10',
       title: '10 — Caching',
       topics: [
-        { title: 'Caching', items: ['Cache-Aside','Read-Through Cache','Write-Through Cache','Write-Behind Cache','Cache Invalidation','TTL','LRU','LFU','Cache Stampede','Cache Penetration','Cache Avalanche','Distributed Cache','Local Cache','CDN Cache','Browser Cache','HTTP Cache','Cache Versioning'] },
-        { title: 'Technologies', items: ['Redis','Memcached','Cloudflare CDN','AWS CloudFront'] }
+        { title: 'Caching Strategies', items: ['Cache-Aside','Read-Through Cache','Write-Through Cache','Write-Behind Cache','Cache Invalidation','Cache Warming','TTL','LRU','LFU','Cache Stampede','Cache Penetration','Cache Avalanche','Distributed Cache','Local Cache','CDN Cache','Browser Cache','HTTP Cache','Cache Versioning'] },
+        { title: 'Technologies', items: ['Memcached','Cloudflare CDN','AWS CloudFront'] }
       ]
     },
     {
       id: 's11',
       title: '11 — Message Brokers',
       topics: [
-        { title: 'Kafka', items: ['Topics','Partitions','Brokers','Producers','Consumers','Consumer Groups','Offsets','Replication','Leader Election','Partition Ordering','Retention','Log Compaction','At-Most-Once Delivery','At-Least-Once Delivery','Exactly-Once Semantics','Consumer Rebalancing','Kafka Connect','Kafka Streams'] },
+        { title: 'Kafka', items: ['Topics','Partitions','Brokers','Producers','Consumers','Consumer Groups','Offsets','Partition Ordering','Retention','Log Compaction','At-Most-Once Delivery','At-Least-Once Delivery','Exactly-Once Semantics','Consumer Rebalancing','Kafka Connect','Kafka Streams'] },
         { title: 'RabbitMQ', items: ['Exchanges','Queues','Bindings','Routing Keys','Direct Exchange','Topic Exchange','Fanout Exchange','Headers Exchange','Acknowledgements','Prefetch','Dead Letter Queues','Retry Queues'] },
         { title: 'Other Messaging Systems', items: ['NATS','NATS JetStream','Amazon SQS','Amazon SNS','Google Pub/Sub'] }
       ]
@@ -312,23 +527,23 @@ li.item{
       id: 's12',
       title: '12 — Distributed Systems',
       topics: [
-        { title: 'Distributed Systems', items: ['CAP Theorem','PACELC','Consistency','Availability','Partition Tolerance','Strong Consistency','Eventual Consistency','Distributed Consensus','Leader Election','Replication','Sharding','Consistent Hashing','Distributed Locks','Clock Synchronization','Network Partitions','Partial Failures','Retries','Timeouts','Idempotency','Duplicate Requests','Exactly-Once Processing','Distributed Transactions','Two-Phase Commit','Saga Pattern','Outbox Pattern','CQRS','Event Sourcing'] }
+        { title: 'Distributed Systems', items: ['CAP Theorem','PACELC','Consistency','Availability','Partition Tolerance','Strong Consistency','Eventual Consistency','Distributed Consensus','Raft Consensus','Paxos','Leader Election','Replication','Sharding','Consistent Hashing','Distributed Locks','Vector Clocks','Lamport Timestamps','Gossip Protocol','Clock Synchronization','Network Partitions','Split Brain','Partial Failures','Idempotency','Duplicate Requests','Exactly-Once Processing','Distributed Transactions','Two-Phase Commit'] }
       ]
     },
     {
       id: 's13',
       title: '13 — System Design',
       topics: [
-        { title: 'Scalability', items: ['Vertical Scaling','Horizontal Scaling','Stateless Services','Load Balancing','Database Scaling','Caching','Sharding','Replication','CDN'] },
-        { title: 'Reliability', items: ['High Availability','Fault Tolerance','Failover','Disaster Recovery','Backup Strategy','Recovery Time Objective','Recovery Point Objective'] },
-        { title: 'Design Problems', items: ['URL Shortener','Rate Limiter','Chat Application','Notification System','Payment System','File Upload System','Video Streaming System','Social Media Feed','Search System','Ride Sharing System','E-commerce System','Hotel Reservation System','Distributed Job Queue','Logging System','Metrics System'] }
+        { title: 'Scalability', items: ['Vertical Scaling','Horizontal Scaling','Stateless Services','Load Balancing','Connection Pooling','Database Sharding','Database Scaling','CDN'] },
+        { title: 'Reliability', items: ['High Availability','Fault Tolerance','Failover','Disaster Recovery','Chaos Engineering','Backup Strategy','Recovery Time Objective','Recovery Point Objective'] },
+        { title: 'Design Problems', items: ['URL Shortener','Rate Limiter','Chat Application','Notification System','Payment System','File Upload System','Video Streaming System','Social Media Feed','Search System','Ride Sharing System','E-commerce System','Hotel Reservation System','Distributed Job Queue','Back-of-envelope Estimation'] }
       ]
     },
     {
       id: 's14',
       title: '14 — Software Architecture',
       topics: [
-        { title: 'Software Architecture', items: ['Layered Architecture','Clean Architecture','Hexagonal Architecture','Ports and Adapters','Domain-Driven Design','Modular Monolith','Microservices','Service-Oriented Architecture','Event-Driven Architecture'] },
+        { title: 'Software Architecture', items: ['Layered Architecture','Clean Architecture','Hexagonal Architecture','Ports and Adapters','Domain-Driven Design','Modular Monolith','Service-Oriented Architecture','Event-Driven Architecture'] },
         { title: 'Design Patterns', items: ['Factory Pattern','Strategy Pattern','Adapter Pattern','Observer Pattern','Decorator Pattern','Builder Pattern','Command Pattern','Repository Pattern','Service Layer Pattern','Dependency Injection','Middleware Pattern'] },
         { title: 'Distributed Patterns', items: ['Circuit Breaker','Retry Pattern','Timeout Pattern','Bulkhead Pattern','Saga Pattern','Outbox Pattern','CQRS','Event Sourcing'] }
       ]
@@ -337,14 +552,14 @@ li.item{
       id: 's15',
       title: '15 — Microservices',
       topics: [
-        { title: 'Microservices', items: ['Service Boundaries','Database per Service','API Gateway','Service Discovery','Configuration Management','Centralized Logging','Distributed Tracing','Health Checks','Circuit Breakers','Retries','Timeouts','Rate Limiting','Distributed Transactions','Event-Driven Communication','Synchronous Communication','Asynchronous Communication','Backward Compatibility','Contract Testing'] }
+        { title: 'Microservices', items: ['Service Boundaries','Database per Service','API Gateway','Service Discovery','Service Mesh','Configuration Management','Health Checks','Distributed Transactions','Event-Driven Communication','Synchronous Communication','Asynchronous Communication','Backward Compatibility','Contract Testing'] }
       ]
     },
     {
       id: 's16',
       title: '16 — Docker',
       topics: [
-        { title: 'Docker', items: ['Docker Images','Docker Containers','Dockerfile','Docker Compose','Docker Networks','Docker Volumes','Docker Registry','Multi-Stage Builds','Image Optimization','Container Health Checks','Container Security','Container Resource Limits','Container Networking','Docker Hub','Private Registries'] }
+        { title: 'Docker', items: ['Docker Images','Docker Containers','Dockerfile','.dockerignore','Docker Compose','Docker Networks','Docker Volumes','Docker Registry','Multi-Stage Builds','BuildKit','Image Optimization','Container Health Checks','Container Security','Container Resource Limits','Container Networking','Docker Hub','Private Registries'] }
       ]
     },
     {
@@ -352,7 +567,7 @@ li.item{
       title: '17 — Kubernetes',
       topics: [
         { title: 'Core Concepts', items: ['Cluster','Node','Pod','Deployment','ReplicaSet','Service','Namespace','ConfigMap','Secret','Ingress','StatefulSet','DaemonSet','Job','CronJob'] },
-        { title: 'Operations', items: ['kubectl','Health Checks','Liveness Probe','Readiness Probe','Startup Probe','Resource Requests','Resource Limits','Horizontal Pod Autoscaling','Rolling Deployments','Rollbacks','Service Discovery','Kubernetes Networking'] },
+        { title: 'Operations', items: ['kubectl','Health Checks','Liveness Probe','Readiness Probe','Startup Probe','Resource Requests','Resource Limits','Horizontal Pod Autoscaling','Rolling Deployments','Rollbacks','Service Discovery','Kubernetes Networking','Service Mesh'] },
         { title: 'Tools', items: ['Helm','Kustomize','Minikube','Kind'] }
       ]
     },
@@ -363,10 +578,11 @@ li.item{
         { title: 'Compute', items: ['EC2','ECS','EKS','Lambda'] },
         { title: 'Storage', items: ['S3','EBS','EFS'] },
         { title: 'Databases', items: ['RDS','Aurora','DynamoDB','ElastiCache'] },
-        { title: 'Networking', items: ['VPC','Subnets','Route Tables','Internet Gateway','NAT Gateway','Security Groups','Network ACLs','Elastic Load Balancer','Application Load Balancer','Network Load Balancer'] },
+        { title: 'Networking', items: ['VPC','Subnets','Route Tables','Internet Gateway','NAT Gateway','Security Groups','Network ACLs','Elastic Load Balancer','Application Load Balancer','Network Load Balancer','Route 53','API Gateway'] },
         { title: 'Messaging', items: ['SQS','SNS','MSK','EventBridge'] },
         { title: 'Monitoring', items: ['CloudWatch','CloudTrail'] },
         { title: 'CDN', items: ['CloudFront'] },
+        { title: 'Container Registry', items: ['ECR'] },
         { title: 'Security', items: ['IAM','KMS','Secrets Manager','Parameter Store'] }
       ]
     },
@@ -375,28 +591,29 @@ li.item{
       title: '19 — DevOps and CI/CD',
       topics: [
         { title: 'Git', items: ['Git Basics','Branching','Merging','Rebasing','Cherry-pick','Revert','Reset','Stash','Git Hooks','Conventional Commits','Git Flow'] },
-        { title: 'CI/CD', items: ['GitHub Actions','GitLab CI','Jenkins','Build Pipelines','Automated Testing','Automated Deployment','Blue-Green Deployment','Canary Deployment','Rolling Deployment','Rollbacks'] },
-        { title: 'Infrastructure as Code', items: ['Terraform','Ansible','Terraform State','Terraform Modules','Infrastructure Provisioning'] }
+        { title: 'CI/CD', items: ['GitHub Actions','GitLab CI','Jenkins','ArgoCD','GitOps','Build Pipelines','Automated Testing','Automated Deployment','Blue-Green Deployment','Canary Deployment','Rolling Deployment','Rollbacks'] },
+        { title: 'Infrastructure as Code', items: ['Terraform','Ansible','Terraform State','Terraform Modules','Infrastructure Provisioning','Makefile'] }
       ]
     },
     {
       id: 's20',
       title: '20 — Observability',
       topics: [
-        { title: 'Logging', items: ['Structured Logging','Log Levels','Request IDs','Correlation IDs','Centralized Logging','Log Aggregation'] },
-        { title: 'Metrics', items: ['Counter','Gauge','Histogram','Summary','RED Method','USE Method','SLI','SLO','SLA'] },
+        { title: 'Logging', items: ['Structured Logging','Log Levels','Request IDs','Correlation IDs','Centralized Logging','Log Aggregation','Log Rotation'] },
+        { title: 'Metrics', items: ['Counter','Gauge','Histogram','Summary','RED Method','USE Method','SLI','SLO','SLA','Alerting'] },
         { title: 'Tracing', items: ['Distributed Tracing','Trace','Span','Context Propagation','Trace Sampling'] },
-        { title: 'Tools', items: ['Prometheus','Grafana','OpenTelemetry','Jaeger','Tempo','Loki','ELK Stack','OpenSearch'] }
+        { title: 'Tools', items: ['Prometheus','Grafana','OpenTelemetry','Jaeger','Tempo','Loki','ELK Stack','OpenSearch'] },
+        { title: 'Incident Management', items: ['On-call','PagerDuty','Runbooks'] }
       ]
     },
     {
       id: 's21',
       title: '21 — Security',
       topics: [
-        { title: 'Authentication', items: ['Session Authentication','JWT','OAuth 2.0','OpenID Connect','SAML','API Keys','Basic Authentication'] },
-        { title: 'Cryptography', items: ['Hashing','Encryption','Symmetric Encryption','Asymmetric Encryption','Public Key Cryptography','Digital Signatures','TLS','Certificates'] },
+        { title: 'Authentication', items: ['Session Authentication','JWT','OAuth 2.0','OpenID Connect','SAML','API Keys','Basic Authentication','mTLS','RBAC'] },
+        { title: 'Cryptography', items: ['Hashing','Encryption','Symmetric Encryption','Asymmetric Encryption','Digital Signatures'] },
         { title: 'Password Security', items: ['bcrypt','Argon2','Password Hashing','Salt'] },
-        { title: 'Web Security', items: ['SQL Injection','XSS','CSRF','SSRF','CORS','Clickjacking','Session Hijacking','Brute Force Protection','Rate Limiting'] },
+        { title: 'Web Security', items: ['SQL Injection','XSS','CSRF','SSRF','CORS','Clickjacking','Session Hijacking','Brute Force Protection'] },
         { title: 'Security Tools', items: ['Keycloak','HashiCorp Vault','AWS Secrets Manager','AWS IAM'] }
       ]
     },
@@ -407,14 +624,15 @@ li.item{
         { title: 'Unit Testing', items: ['Go Testing Package','Test Tables','Test Fixtures','Test Helpers','Mocks','Stubs','Fakes','Test Coverage'] },
         { title: 'Integration Testing', items: ['Database Integration Tests','Redis Integration Tests','Kafka Integration Tests','API Integration Tests','Testcontainers'] },
         { title: 'End-to-End Testing', items: ['E2E Testing','API E2E Testing','User Flow Testing'] },
-        { title: 'Testing Tools', items: ['Testify','GoMock','Mockery','Testcontainers','Postman','Newman','k6'] }
+        { title: 'Advanced Testing', items: ['Fuzz Testing','Benchmark Testing'] },
+        { title: 'Testing Tools', items: ['Testify','GoMock','Mockery','Postman','Newman','k6'] }
       ]
     },
     {
       id: 's23',
       title: '23 — Performance Engineering',
       topics: [
-        { title: 'Performance Engineering', items: ['CPU Profiling','Memory Profiling','Goroutine Profiling','Benchmarking','Load Testing','Stress Testing','Soak Testing','Capacity Planning','Latency Analysis','Throughput Analysis','Memory Leaks','Goroutine Leaks','Connection Pool Tuning','Database Query Optimization','Cache Optimization','Network Optimization'] },
+        { title: 'Performance Engineering', items: ['Benchmarking','Load Testing','Stress Testing','Soak Testing','Capacity Planning','Latency Analysis','Throughput Analysis','Memory Leaks','Goroutine Leaks','Connection Pool Tuning','Cache Optimization','Flame Graphs','Heap dump analysis'] },
         { title: 'Tools', items: ['Go pprof','perf','k6','Apache JMeter','Locust'] }
       ]
     },
@@ -423,15 +641,15 @@ li.item{
       title: '24 — Search and Analytics',
       topics: [
         { title: 'Elasticsearch / OpenSearch', items: ['Indexes','Documents','Mappings','Inverted Index','Full-Text Search','Queries','Aggregations','Sharding','Replication'] },
-        { title: 'Other Databases', items: ['MongoDB','Cassandra','DynamoDB','ClickHouse','Neo4j'] }
+        { title: 'Other Databases', items: ['MongoDB','Cassandra','ClickHouse','Neo4j'] }
       ]
     },
     {
       id: 's25',
       title: '25 — Professional Senior Engineer Skills',
       topics: [
-        { title: 'Code Quality', items: ['SOLID Principles','Clean Code','Code Reviews','Refactoring','Technical Debt','Design Documentation','ADRs','API Design','Backward Compatibility'] },
-        { title: 'Engineering Practices', items: ['Requirements Analysis','Technical Estimation','System Design','Trade-off Analysis','Incident Response','Root Cause Analysis','Postmortems','Production Debugging','Technical Leadership','Mentoring'] }
+        { title: 'Code Quality', items: ['SOLID Principles','Clean Code','Code Reviews','Refactoring','Technical Debt','Design Documentation','ADRs','API Design','Backward Compatibility','Technical Writing'] },
+        { title: 'Engineering Practices', items: ['Requirements Analysis','Technical Estimation','System Design','Trade-off Analysis','Incident Response','Root Cause Analysis','Postmortems','Production Debugging','Runbooks','On-call Rotation','Technical Leadership','Mentoring'] }
       ]
     },
     {
@@ -469,115 +687,36 @@ li.item{
     }
   ];
 
-  // Resource links mapped to section IDs (from resource-url.md)
-  const resources = {
-    's1': [
-      { group: 'Core Go', links: [
-        { title: 'Go by Example', url: 'https://gobyexample.com/' },
-        { title: 'Effective Go (official)', url: 'https://go.dev/doc/effective_go' },
-        { title: 'Learning Go — Jon Bodner', url: null, book: true },
-        { title: 'Go Concurrency Patterns — Rob Pike', url: 'https://www.youtube.com/watch?v=f6kdp27TYZs' }
-      ]},
-      { group: 'Advanced / Performance', links: [
-        { title: 'Ardan Labs Go Training', url: 'https://github.com/ardanlabs/gotraining' },
-        { title: "Julia Evans' Blog", url: 'https://jvns.ca/' },
-        { title: "Dave Cheney's Blog", url: 'https://dave.cheney.net/' },
-        { title: 'Go pprof Official Blog Post', url: 'https://go.dev/blog/pprof' }
-      ]}
-    ],
-    's8': [
-      { group: 'PostgreSQL + pgx + sqlc', links: [
-        { title: 'sqlc Documentation', url: 'https://docs.sqlc.dev/' },
-        { title: 'pgx (GitHub)', url: 'https://github.com/jackc/pgx' },
-        { title: 'Use The Index, Luke', url: 'https://use-the-index-luke.com/' }
-      ]}
-    ],
-    's9': [
-      { group: 'Redis', links: [
-        { title: 'Redis University (free courses)', url: 'https://university.redis.com/' }
-      ]}
-    ],
-    's22': [
-      { group: 'Testing', links: [
-        { title: 'testcontainers-go Documentation', url: 'https://golang.testcontainers.org/' },
-        { title: 'Testify (GitHub)', url: 'https://github.com/stretchr/testify' }
-      ]}
-    ],
-    's16': [
-      { group: 'Docker', links: [
-        { title: 'Docker Multi-Stage Builds Guide', url: 'https://docs.docker.com/build/building/multi-stage/' }
-      ]}
-    ],
-    's4': [
-      { group: 'Linux', links: [
-        { title: 'Wizard Zines — Julia Evans', url: 'https://wizardzines.com/' },
-        { title: 'Brendan Gregg — Linux Performance', url: 'https://www.brendangregg.com/linuxperf.html' }
-      ]}
-    ],
-    's19': [
-      { group: 'CI/CD', links: [
-        { title: 'GitHub Actions Documentation', url: 'https://docs.github.com/en/actions' },
-        { title: 'GitHub Actions for Go — Example Workflows', url: 'https://github.com/mvdan/github-actions-golang' }
-      ]},
-      { group: 'Infrastructure as Code', links: [] }
-    ],
-    's18': [
-      { group: 'AWS', links: [
-        { title: 'AWS Skill Builder (free tier)', url: 'https://skillbuilder.aws/' },
-        { title: 'AWS Architecture Center', url: 'https://aws.amazon.com/architecture/' }
-      ]}
-    ],
-    's20': [
-      { group: 'Observability', links: [
-        { title: 'Prometheus Documentation', url: 'https://prometheus.io/docs/introduction/overview/' },
-        { title: 'Grafana Tutorials', url: 'https://grafana.com/tutorials/' },
-        { title: 'OpenTelemetry — Go Docs', url: 'https://opentelemetry.io/docs/languages/go/' }
-      ]}
-    ],
-    's11': [
-      { group: 'Kafka', links: [
-        { title: 'Confluent Developer — Free Kafka Courses', url: 'https://developer.confluent.io/courses/' },
-        { title: 'Kafka: The Definitive Guide', url: null, book: true }
-      ]}
-    ],
-    's12': [
-      { group: 'Distributed Systems', links: [
-        { title: 'MIT 6.824 Distributed Systems (free, labs in Go)', url: 'https://pdos.csail.mit.edu/6.824/' },
-        { title: 'Designing Data-Intensive Applications — Kleppmann', url: null, book: true }
-      ]}
-    ],
-    's13': [
-      { group: 'System Design', links: [
-        { title: 'systemdesign.one', url: 'https://systemdesign.one/' },
-        { title: 'ByteByteGo (YouTube)', url: 'https://www.youtube.com/@ByteByteGo' },
-        { title: 'Excalidraw (for diagramming)', url: 'https://excalidraw.com/' }
-      ]}
-    ],
-    's15': [
-      { group: 'Microservices', links: [
-        { title: 'microservices.io — Chris Richardson', url: 'https://microservices.io/' }
-      ]}
-    ],
-    's17': [
-      { group: 'Kubernetes', links: [
-        { title: 'Kubernetes Official Tutorials', url: 'https://kubernetes.io/docs/tutorials/' },
-        { title: 'Killercoda — Free Interactive K8s', url: 'https://killercoda.com/' }
-      ]}
-    ],
-    's23': [
-      { group: 'Performance Engineering', links: [
-        { title: 'Go pprof Guide', url: 'https://go.dev/blog/pprof' },
-        { title: 'Systems Performance — Brendan Gregg', url: null, book: true }
-      ]}
-    ],
-    's24': [
-      { group: 'Distributed Databases', links: [
-        { title: 'CMU Database Group Lectures (YouTube)', url: 'https://www.youtube.com/@cmudatabasegroup' }
-      ]},
-      { group: 'Load Testing', links: [
-        { title: 'k6 Documentation', url: 'https://k6.io/docs/' }
-      ]}
-    ]
+  // Map section IDs to resource page anchors (category name slugified)
+  const sectionResources = {
+    's1': 'core-go',
+    's2': 'core-go',
+    's3': null,
+    's4': 'linux',
+    's5': null,
+    's6': null,
+    's7': null,
+    's8': 'postgresql-pgx-sqlc',
+    's9': 'redis',
+    's10': 'redis',
+    's11': 'kafka',
+    's12': 'distributed-systems',
+    's13': 'system-design',
+    's14': 'microservices',
+    's15': 'microservices',
+    's16': 'docker',
+    's17': 'kubernetes',
+    's18': 'aws',
+    's19': 'ci-cd',
+    's20': 'observability',
+    's21': null,
+    's22': 'testing',
+    's23': 'performance-engineering',
+    's24': 'distributed-databases',
+    's25': null,
+    's26': null,
+    's27': null,
+    's28': null
   };
 
   const STORAGE_KEY = 'notebound-checklist-progress';
@@ -585,6 +724,11 @@ li.item{
   try { checked = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { checked = {}; }
 
   let openSections = {};
+  let openSidebar = {};
+  data.forEach((_, i) => openSidebar[i] = false);
+
+  // Open first section by default
+  if(data.length) openSections[data[0].id] = true;
 
   function itemKey(sectionId, topicIdx, itemIdx){
     return sectionId + '__' + topicIdx + '__' + itemIdx;
@@ -593,10 +737,19 @@ li.item{
   function countSection(section){
     let total = 0, done = 0;
     section.topics.forEach((t, ti) => {
-      t.items.forEach((it, ii) => {
+      t.items.forEach((_, ii) => {
         total++;
         if(checked[itemKey(section.id, ti, ii)]) done++;
       });
+    });
+    return { total, done };
+  }
+
+  function countTopic(section, topicIdx){
+    let total = 0, done = 0;
+    section.topics[topicIdx].items.forEach((_, ii) => {
+      total++;
+      if(checked[itemKey(section.id, topicIdx, ii)]) done++;
     });
     return { total, done };
   }
@@ -611,125 +764,261 @@ li.item{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(checked));
   }
 
-  function render(){
-    const container = document.getElementById('sections');
-    container.innerHTML = '';
+  // Topic icon svg
+  const topicSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
 
-    data.forEach(section => {
+  // Copy icon svg
+  const copySvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+
+  // Resource link icon
+  const resourceSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+
+  function showToast(text){
+    const toast = document.getElementById('copy-toast');
+    toast.textContent = text;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1400);
+  }
+
+  function copyText(text, e){
+    e.stopPropagation();
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Copied: ' + text);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Copied: ' + text);
+    });
+  }
+
+  function buildSidebar(){
+    const sidebarNav = document.getElementById('sidebar-nav');
+    sidebarNav.innerHTML = '';
+
+    data.forEach((section, si) => {
+      const { total, done } = countSection(section);
+      const group = document.createElement('div');
+      group.className = 'level-group' + (openSidebar[si] ? ' open' : '');
+
+      const btn = document.createElement('button');
+      btn.className = 'level-btn';
+      const numPart = section.title.split('—')[0].trim();
+      const namePart = section.title.split('—')[1] ? section.title.split('—')[1].trim() : '';
+      btn.innerHTML = `<span>${numPart} — ${namePart}</span> <span style="display:flex;align-items:center;gap:6px;"><span class="nav-count${done===total?' complete':''}">${done}/${total}</span><span class="chevron">▸</span></span>`;
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        openSidebar[si] = !openSidebar[si];
+        buildSidebar();
+      };
+      // Also click to scroll to section
+      btn.ondblclick = () => {
+        const target = document.getElementById(`section-${section.id}`);
+        if(target){
+          if(!openSections[section.id]){
+            openSections[section.id] = true;
+            buildContent();
+          }
+          setTimeout(() => target.scrollIntoView({ behavior:'smooth', block:'start' }), 50);
+        }
+      };
+      group.appendChild(btn);
+
+      const items = document.createElement('div');
+      items.className = 'level-items';
+      section.topics.forEach((topic, ti) => {
+        const { total: tt, done: td } = countTopic(section, ti);
+        const navItem = document.createElement('button');
+        navItem.className = 'nav-item';
+        navItem.innerHTML = `<span>${topic.title}</span> <span class="nav-count${td===tt?' complete':''}">${td}/${tt}</span>`;
+        navItem.onclick = () => {
+          // open section if closed
+          if(!openSections[section.id]){
+            openSections[section.id] = true;
+            buildContent();
+          }
+          setTimeout(() => {
+            const target = document.getElementById(`topic-${section.id}-${ti}`);
+            if(target){
+              target.scrollIntoView({ behavior:'smooth', block:'center' });
+              target.style.background = 'rgba(179,58,48,0.06)';
+              target.style.borderRadius = '8px';
+              setTimeout(() => { target.style.background = ''; target.style.borderRadius = ''; }, 1500);
+            }
+            // set active
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            navItem.classList.add('active');
+          }, 100);
+        };
+        items.appendChild(navItem);
+      });
+      group.appendChild(items);
+      sidebarNav.appendChild(group);
+    });
+  }
+
+  function buildContent(){
+    const content = document.getElementById('content');
+    content.innerHTML = '';
+
+    data.forEach((section, si) => {
       const { total, done } = countSection(section);
       const isOpen = !!openSections[section.id];
 
-      const sectionEl = document.createElement('div');
-      sectionEl.className = 'section' + (isOpen ? ' open' : '');
+      const card = document.createElement('div');
+      card.className = 'section-card' + (isOpen ? ' open' : '');
+      card.id = `section-${section.id}`;
 
-      const head = document.createElement('button');
+      // Head
+      const head = document.createElement('div');
       head.className = 'section-head';
+      const numPart = section.title.split('—')[0].trim();
+      const namePart = section.title.split('—')[1] ? section.title.split('—')[1].trim() : '';
+      const resAnchor = sectionResources[section.id];
+      const resLink = resAnchor ? `<a href="resources.html#${resAnchor}" class="section-resource-link" onclick="event.stopPropagation()">${resourceSvg} Resources</a>` : '';
       head.innerHTML = `
-        <span class="section-title"><span class="tab">${section.title.split('—')[0].trim()}</span> ${section.title.split('—')[1] ? section.title.split('—')[1].trim() : ''}</span>
-        <span style="display:flex; align-items:center;">
-          <span class="section-progress${done===total ? ' complete' : ''}">${done} / ${total}</span>
-          <span class="chevron">▸</span>
+        <span class="section-title"><span class="tab">${numPart}</span><span class="section-title-text">${namePart}</span></span>
+        <span class="section-meta">
+          ${resLink}
+          <span class="section-progress${done===total?' complete':''}">${done} / ${total}</span>
+          <span class="s-chevron">▸</span>
         </span>
       `;
-      head.onclick = () => { openSections[section.id] = !isOpen; render(); };
+      head.onclick = () => {
+        openSections[section.id] = !isOpen;
+        buildContent();
+      };
+      card.appendChild(head);
 
-      const topicsEl = document.createElement('div');
-      topicsEl.className = 'topics';
+      // Body
+      const body = document.createElement('div');
+      body.className = 'section-body';
+      const bodyInner = document.createElement('div');
+      bodyInner.className = 'section-body-inner';
 
       section.topics.forEach((topic, ti) => {
-        const topicEl = document.createElement('div');
-        topicEl.className = 'topic';
-        const topicTitle = document.createElement('p');
-        topicTitle.className = 'topic-title';
-        topicTitle.textContent = topic.title;
-        topicEl.appendChild(topicTitle);
+        const block = document.createElement('div');
+        block.className = 'topic-block';
+        block.id = `topic-${section.id}-${ti}`;
 
-        const ul = document.createElement('ul');
-        ul.className = 'item-list';
+        const title = document.createElement('h3');
+        title.className = 'topic-title';
+        title.innerHTML = `${topicSvg} ${topic.title}`;
+        block.appendChild(title);
+
+        const wrap = document.createElement('div');
+        wrap.className = 'items-wrap';
+
         topic.items.forEach((itemText, ii) => {
           const key = itemKey(section.id, ti, ii);
           const isDone = !!checked[key];
 
-          const li = document.createElement('li');
-          li.className = 'item';
+          const tag = document.createElement('div');
+          tag.className = 'item-tag' + (isDone ? ' done' : '');
 
-          const box = document.createElement('button');
-          box.className = 'check-box' + (isDone ? ' done' : '');
-          box.setAttribute('aria-label', isDone ? 'Mark not done' : 'Mark done');
-          box.onclick = () => { checked[key] = !isDone; save(); render(); };
+          // Checkbox
+          const chk = document.createElement('span');
+          chk.className = 'item-check';
 
-          const span = document.createElement('span');
-          span.className = 'item-text' + (isDone ? ' done' : '');
-          span.textContent = itemText;
-          span.onclick = () => { checked[key] = !isDone; save(); render(); };
+          // Label
+          const label = document.createElement('span');
+          label.className = 'item-label';
+          label.textContent = itemText;
 
-          li.appendChild(box);
-          li.appendChild(span);
-          ul.appendChild(li);
+          // Copy button
+          const copyBtn = document.createElement('span');
+          copyBtn.className = 'item-copy';
+          copyBtn.innerHTML = copySvg;
+          copyBtn.title = 'Copy to clipboard';
+          copyBtn.onclick = (e) => copyText(itemText, e);
+
+          tag.appendChild(chk);
+          tag.appendChild(label);
+          tag.appendChild(copyBtn);
+
+          // Click tag to toggle done
+          tag.onclick = () => {
+            checked[key] = !isDone;
+            save();
+            render();
+          };
+
+          wrap.appendChild(tag);
         });
-        topicEl.appendChild(ul);
-        topicsEl.appendChild(topicEl);
+
+        block.appendChild(wrap);
+        bodyInner.appendChild(block);
       });
 
-      // Render resource links if section has resources
-      const sectionResources = resources[section.id];
-      if(sectionResources && sectionResources.length > 0){
-        const resBlock = document.createElement('div');
-        resBlock.className = 'resources-block';
-
-        const resHeading = document.createElement('p');
-        resHeading.className = 'resources-heading';
-        resHeading.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Learning Resources`;
-        resBlock.appendChild(resHeading);
-
-        sectionResources.forEach(group => {
-          if(group.links.length === 0) return;
-          const groupTitle = document.createElement('p');
-          groupTitle.className = 'resource-group-title';
-          groupTitle.textContent = group.group;
-          resBlock.appendChild(groupTitle);
-
-          const linkList = document.createElement('ul');
-          linkList.className = 'resource-links';
-          group.links.forEach(link => {
-            const li = document.createElement('li');
-            if(link.url){
-              const a = document.createElement('a');
-              a.className = 'resource-link';
-              a.href = link.url;
-              a.target = '_blank';
-              a.rel = 'noopener noreferrer';
-              a.innerHTML = `${link.title} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-              li.appendChild(a);
-            } else {
-              const span = document.createElement('span');
-              span.className = 'resource-link';
-              span.innerHTML = `${link.title} <span class="book-tag">BOOK</span>`;
-              li.appendChild(span);
-            }
-            linkList.appendChild(li);
-          });
-          resBlock.appendChild(linkList);
-        });
-
-        topicsEl.appendChild(resBlock);
-      }
-
-      // (topics forEach already closed above)
-
-
-      sectionEl.appendChild(head);
-      sectionEl.appendChild(topicsEl);
-      container.appendChild(sectionEl);
+      body.appendChild(bodyInner);
+      card.appendChild(body);
+      content.appendChild(card);
     });
-
-    const overall = countAll();
-    document.getElementById('overall').innerHTML = `<b>${overall.done} of ${overall.total}</b> topics crossed off across ${data.length} chapters`;
   }
 
-  // open the first section by default
-  if(data.length) openSections[data[0].id] = true;
+  function updateStats(){
+    const overall = countAll();
+    const pct = overall.total ? Math.round((overall.done / overall.total) * 100) : 0;
+    document.getElementById('sidebar-stats').textContent = `${data.length} sections · ${overall.total} topics`;
+    document.getElementById('main-stats').innerHTML = `<b>${overall.done}</b> of <b>${overall.total}</b> topics mastered · <b>${pct}%</b> complete`;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = `${overall.done} / ${overall.total} done (${pct}%)`;
+  }
+
+  function render(){
+    buildSidebar();
+    buildContent();
+    updateStats();
+  }
+
   render();
+
+  // ── Mobile toggle ──
+  const toggleBtn = document.getElementById('sidebar-toggle');
+  const sidebar = document.getElementById('sidebar');
+  if(toggleBtn){
+    toggleBtn.onclick = () => sidebar.classList.toggle('collapsed');
+  }
+
+  // ── Scroll spy for active nav ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const id = entry.target.id;
+        // topic-sX-Y
+        if(id.startsWith('topic-')){
+          document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+          const parts = id.replace('topic-','').split('-');
+          const sectionId = parts[0];
+          const topicIdx = parseInt(parts[1]);
+          let idx = 0;
+          for(let i = 0; i < data.length; i++){
+            if(data[i].id === sectionId) break;
+            idx += data[i].topics.length;
+          }
+          idx += topicIdx;
+          const navItems = document.querySelectorAll('.nav-item');
+          if(navItems[idx]) navItems[idx].classList.add('active');
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  // Observe topic blocks after render
+  const observeTopics = () => {
+    document.querySelectorAll('.topic-block').forEach(block => observer.observe(block));
+  };
+  observeTopics();
+
+  // Re-observe on content rebuild
+  const origBuildContent = buildContent;
+  buildContent = function(){
+    origBuildContent();
+    observeTopics();
+  };
+
 })();
 </script>
 </body>
