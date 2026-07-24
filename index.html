@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Notebound — study checklist</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --paper: #F4EFE1;
+  --paper-dark: #E9E2CE;
+  --graphite: #1A1714;
+  --sepia: #5C4A32;
+  --red-pen: #B33A30;
+  --rule: #C9C1A8;
+  --card-bg: rgba(255,255,255,0.55);
+  --card-shadow: 0 2px 12px rgba(46,42,36,0.10), 0 1px 3px rgba(46,42,36,0.08);
+  --card-hover-shadow: 0 6px 24px rgba(46,42,36,0.15), 0 2px 6px rgba(46,42,36,0.10);
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 36px, var(--rule) 36px, var(--rule) 37px),
+    radial-gradient(ellipse at top left, rgba(139,115,85,0.08), transparent 60%),
+    radial-gradient(ellipse at bottom right, rgba(139,115,85,0.06), transparent 60%);
+  color:var(--graphite);
+  font-family:'Comfortaa', cursive;
+  min-height:100vh;
+}
+
+.margin-line{
+  position:fixed; top:0; bottom:0; left:56px; width:2px;
+  background:rgba(196,69,58,0.3);
+}
+
+.wrap{max-width:960px;margin:0 auto;padding:56px 36px 90px 96px;}
+
+.eyebrow{
+  font-size:14px; color:var(--sepia); letter-spacing:1px;
+  transform:rotate(-1deg); display:inline-block; margin-bottom:4px;
+}
+
+h1{
+  font-family:'Comfortaa', cursive; font-weight:700;
+  font-size:46px; line-height:1.05; margin:0 0 8px 0;
+}
+.underline-scribble{position:relative; display:inline-block;}
+.underline-scribble svg{position:absolute; left:0; bottom:-8px; width:100%; height:14px;}
+
+.overall{
+  font-size:16px; color:var(--sepia); margin:0 0 40px 0; transform:rotate(-0.4deg);
+}
+.overall b{color:var(--graphite);}
+
+.section{
+  margin-bottom:14px;
+  background:var(--card-bg);
+  border:1px solid rgba(46,42,36,0.10);
+  border-radius:12px;
+  box-shadow:var(--card-shadow);
+  transition:box-shadow 0.2s ease, transform 0.2s ease;
+  overflow:hidden;
+}
+.section:hover{
+  box-shadow:var(--card-hover-shadow);
+  transform:translateY(-2px);
+}
+
+.section-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; cursor:pointer; background:none; border:none; width:100%;
+  font-family:'Comfortaa', cursive; font-size:23px; color:var(--graphite);
+  text-align:left; transition:background 0.15s ease;
+}
+.section-head:hover{
+  background:rgba(139,115,85,0.06);
+}
+.section-head:focus-visible{outline:2px dashed var(--red-pen); outline-offset:3px;}
+
+.section-title{display:flex; align-items:center; gap:10px;}
+.tab{
+  display:inline-block; background:var(--paper-dark); border:1px solid rgba(46,42,36,0.18);
+  font-size:13px; font-family:'Comfortaa',cursive; color:var(--graphite);
+  padding:3px 10px; transform:rotate(-2deg); border-radius:4px;
+}
+
+.section-progress{font-size:15px; color:var(--graphite); white-space:nowrap; font-weight:600;}
+.section-progress.complete{color:var(--red-pen);}
+
+.chevron{transition:transform 0.15s ease; margin-left:12px; color:var(--sepia); font-size:16px;}
+.section.open .chevron{transform:rotate(90deg);}
+
+.topics{
+  max-height:0; overflow:hidden; transition:max-height 0.25s ease;
+  padding-left:20px; padding-right:16px;
+}
+.section.open .topics{max-height:5000px;}
+
+.topic{margin:6px 0 18px 10px;}
+.topic-title{
+  font-size:17px; color:var(--graphite); font-weight:600; margin:0 0 8px 2px; transform:rotate(-0.3deg);
+}
+
+ul.item-list{
+  list-style:none; margin:0; padding:0;
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:4px 24px;
+}
+li.item{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:7px 2px; font-size:17px; color:var(--graphite);
+}
+
+.check-box{
+  width:19px; height:19px; border:2.5px solid var(--graphite);
+  flex-shrink:0; margin-top:2px; position:relative; cursor:pointer;
+  background:none; padding:0; border-radius:1px;
+}
+.check-box.done::after{
+  content:''; position:absolute; left:1px; top:6px; width:12px; height:6px;
+  border-left:3px solid var(--red-pen); border-bottom:3px solid var(--red-pen);
+  transform:rotate(-45deg);
+}
+
+.item-text{cursor:pointer; line-height:1.4; color:var(--graphite);}
+.item-text.done{color:var(--sepia); position:relative;}
+.item-text.done::after{
+  content:''; position:absolute; left:0; top:50%; width:100%; height:2px;
+  background:var(--red-pen); transform:translateY(-50%) rotate(-0.6deg);
+}
+
+/* Resource links */
+.resources-block{
+  margin:10px 10px 18px 10px;
+  padding:14px 18px;
+  background:rgba(92,74,50,0.05);
+  border-left:3px solid var(--red-pen);
+  border-radius:0 8px 8px 0;
+}
+.resources-heading{
+  font-size:14px; font-weight:700; color:var(--red-pen);
+  letter-spacing:0.5px; margin:0 0 10px 0;
+  display:flex; align-items:center; gap:6px;
+}
+.resources-heading svg{width:16px; height:16px; flex-shrink:0;}
+.resource-group-title{
+  font-size:13px; font-weight:600; color:var(--sepia);
+  margin:10px 0 4px 0; transform:rotate(-0.3deg);
+}
+.resource-group-title:first-child{margin-top:0;}
+.resource-links{
+  display:flex; flex-wrap:wrap; gap:6px 8px; margin:0; padding:0; list-style:none;
+}
+.resource-link{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 12px; font-size:13px; font-family:'Comfortaa',cursive;
+  color:var(--graphite); background:rgba(255,255,255,0.7);
+  border:1px solid rgba(46,42,36,0.14); border-radius:20px;
+  text-decoration:none; transition:all 0.15s ease;
+  line-height:1.4;
+}
+.resource-link:hover{
+  background:var(--paper-dark); border-color:var(--red-pen);
+  color:var(--red-pen); transform:translateY(-1px);
+  box-shadow:0 2px 8px rgba(179,58,48,0.10);
+}
+.resource-link svg{
+  width:12px; height:12px; flex-shrink:0; opacity:0.5;
+  transition:opacity 0.15s ease;
+}
+.resource-link:hover svg{opacity:1;}
+.resource-link .book-tag{
+  font-size:10px; background:var(--red-pen); color:#fff;
+  padding:1px 5px; border-radius:3px; font-weight:600;
+}
+
+@media (max-width:600px){
+  .wrap{padding:40px 18px 60px 52px;}
+  .margin-line{left:24px;}
+  h1{font-size:34px;}
+  .section-head{font-size:19px;}
+  ul.item-list{grid-template-columns:1fr;}
+  .resources-block{margin:10px 4px 14px 4px; padding:10px 12px;}
+}
+</style>
+</head>
+<body>
+<div class="margin-line"></div>
+<div class="wrap">
+
+  <span class="eyebrow">the syllabus, kept the way you'd keep it on paper</span>
+  <h1>
+    <span class="underline-scribble">
+      Study checklist
+      <svg viewBox="0 0 260 14" preserveAspectRatio="none"><path d="M2,8 Q60,2 130,8 T258,7" stroke="#C4453A" stroke-width="3" fill="none"/></svg>
+    </span>
+  </h1>
+  <p class="overall" id="overall"></p>
+
+  <div id="sections"></div>
+
+</div>
+
+<script>
+(function(){
+  // Fixed structure: sections -> topics -> items. Edit this data to match your real syllabus.
+  const data = [
+    {
+      id: 's1',
+      title: '1 — Go Programming Language',
+      topics: [
+        { title: 'Core Go', items: ['Variables and constants','Primitive data types','Arrays','Slices','Maps','Structs','Methods','Pointers','Functions','Multiple return values','Variadic functions','Closures','Defer','Panic','Recover','Interfaces','Composition','Embedding','Type assertions','Type switches','Generics','Reflection'] },
+        { title: 'Go Error Handling', items: ['error interface','errors.New','fmt.Errorf','%w error wrapping','errors.Is','errors.As','Custom errors','Error handling strategies','Error propagation','Sentinel errors','Error design in APIs'] },
+        { title: 'Go Concurrency', items: ['Goroutines','Channels','Buffered channels','Unbuffered channels','Directional channels','select','Channel closing','Worker pools','Fan-in','Fan-out','Pipelines','sync.Mutex','sync.RWMutex','sync.WaitGroup','sync.Once','sync.Cond','sync.Pool','sync/atomic','Atomic operations','Race conditions','Deadlocks','Livelocks','Starvation','Go Memory Model','Race detector'] },
+        { title: 'Go Runtime and Internals', items: ['Goroutine scheduler','GMP model','Stack growth','Heap vs stack','Escape analysis','Garbage collection','Garbage collector tuning','Memory allocation','Object lifetime','Runtime package','CPU profiling','Memory profiling','Goroutine profiling'] },
+        { title: 'Go Project and Tooling', items: ['Go modules','go.mod','go.sum','Dependency management','Semantic versioning','Build tags','Cross compilation','go build','go run','go test','go vet','go fmt','go generate','go install','go list','go env','pprof','Go benchmarks','golangci-lint','staticcheck','Delve debugger'] }
+      ]
+    },
+    {
+      id: 's2',
+      title: '2 — Go Standard Library',
+      topics: [
+        { title: 'Standard Library', items: ['net/http','context','database/sql','encoding/json','encoding/xml','os','io','bufio','bytes','strings','strconv','time','sync','sync/atomic','errors','log/slog','crypto','crypto/tls','crypto/sha256','crypto/rand','net','os/signal','syscall','reflect','runtime','testing'] }
+      ]
+    },
+    {
+      id: 's3',
+      title: '3 — Data Structures and Algorithms',
+      topics: [
+        { title: 'Data Structures', items: ['Arrays','Strings','Linked Lists','Stacks','Queues','Deques','Hash Tables','Binary Trees','Binary Search Trees','AVL Trees','Red-Black Trees','Heaps','Priority Queues','Tries','Graphs','Union-Find / Disjoint Set'] },
+        { title: 'Algorithms', items: ['Binary Search','Sorting','Merge Sort','Quick Sort','Heap Sort','BFS','DFS','Dijkstra','Bellman-Ford','Floyd-Warshall','Topological Sort','Union-Find Algorithms','Dynamic Programming','Greedy Algorithms','Backtracking','Sliding Window','Two Pointers','Prefix Sum','Recursion','Bit Manipulation'] },
+        { title: 'Complexity', items: ['Big O','Big Omega','Big Theta','Time Complexity','Space Complexity','Amortized Complexity'] }
+      ]
+    },
+    {
+      id: 's4',
+      title: '4 — Computer Science Fundamentals',
+      topics: [
+        { title: 'Operating Systems', items: ['Processes','Threads','Goroutines vs Threads','Context Switching','CPU Scheduling','Memory Management','Virtual Memory','Paging','Page Faults','Stack','Heap','File Descriptors','System Calls','Signals','Inter-Process Communication','Pipes','Shared Memory','Semaphores','Mutexes','Deadlocks'] },
+        { title: 'Linux', items: ['Linux filesystem','File permissions','Users and groups','Processes','Services','Environment variables','Shell scripting','Bash','systemctl','journalctl','ps','top','htop','lsof','strace','vmstat','iostat','df','du','free','ss','netstat','kill','grep','awk','sed','find','xargs'] }
+      ]
+    },
+    {
+      id: 's5',
+      title: '5 — Networking',
+      topics: [
+        { title: 'Networking Fundamentals', items: ['OSI Model','TCP/IP Model','IP Addresses','IPv4','IPv6','Subnetting','CIDR','MAC Addresses','ARP','NAT','Firewalls','Ports','Sockets'] },
+        { title: 'TCP', items: ['TCP Handshake','TCP Connection Termination','TCP Flow Control','TCP Congestion Control','TCP Retransmission','TCP Keepalive','TCP Connection Pooling'] },
+        { title: 'UDP', items: ['UDP Characteristics','UDP vs TCP','Use Cases'] },
+        { title: 'DNS', items: ['DNS Resolution','DNS Records','A Record','AAAA Record','CNAME','MX','TXT','NS','DNS Caching','DNS TTL'] },
+        { title: 'TLS', items: ['TLS Handshake','Certificates','Certificate Authorities','Public Key Cryptography','Symmetric Encryption','HTTPS','TLS Termination'] },
+        { title: 'Networking Tools', items: ['curl','ping','dig','nslookup','traceroute','ss','netstat','Wireshark'] }
+      ]
+    },
+    {
+      id: 's6',
+      title: '6 — HTTP',
+      topics: [
+        { title: 'HTTP', items: ['HTTP Request','HTTP Response','HTTP Methods','HTTP Status Codes','HTTP Headers','HTTP Cookies','HTTP Sessions','HTTP Keep-Alive','HTTP Connection Pooling','HTTP Compression','HTTP Streaming','HTTP/1.0','HTTP/1.1','HTTP/2','HTTP/3','QUIC','CORS','CSRF','HTTP Caching','Cache-Control','ETag','Last-Modified','Conditional Requests','Content Negotiation','Multipart Requests','Server-Sent Events'] }
+      ]
+    },
+    {
+      id: 's7',
+      title: '7 — API Development',
+      topics: [
+        { title: 'REST API', items: ['REST Principles','Resource Design','HTTP Methods','Idempotency','Pagination','Cursor Pagination','Offset Pagination','Filtering','Sorting','Searching','API Versioning','Error Response Design','Rate Limiting','Request Validation','Response Validation','API Documentation','OpenAPI','Swagger'] },
+        { title: 'gRPC', items: ['Protocol Buffers','Unary RPC','Server Streaming','Client Streaming','Bidirectional Streaming','Deadlines','Timeouts','Cancellation','Interceptors','Metadata','Error Handling','gRPC Health Checking','gRPC Load Balancing'] },
+        { title: 'Other API Technologies', items: ['GraphQL','WebSockets','Server-Sent Events','Webhooks','Long Polling'] }
+      ]
+    },
+    {
+      id: 's8',
+      title: '8 — PostgreSQL',
+      topics: [
+        { title: 'SQL', items: ['SELECT','INSERT','UPDATE','DELETE','WHERE','ORDER BY','GROUP BY','HAVING','JOIN','INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL JOIN','CROSS JOIN','Subqueries','CTEs','Window Functions','Aggregation','UNION','INTERSECT','EXCEPT'] },
+        { title: 'Database Design', items: ['Primary Keys','Foreign Keys','Unique Constraints','Check Constraints','Not Null Constraints','Natural Keys','Surrogate Keys','Normalization','Denormalization','1NF','2NF','3NF','BCNF'] },
+        { title: 'Indexes', items: ['B-Tree Index','Hash Index','GIN Index','GiST Index','BRIN Index','Composite Index','Partial Index','Covering Index','Index Selectivity','Index Scan','Sequential Scan'] },
+        { title: 'Transactions', items: ['ACID','Atomicity','Consistency','Isolation','Durability','Read Uncommitted','Read Committed','Repeatable Read','Serializable','MVCC','Row Locks','Table Locks','Deadlocks','Optimistic Locking','Pessimistic Locking'] },
+        { title: 'Performance', items: ['EXPLAIN','EXPLAIN ANALYZE','Query Optimization','Slow Queries','Connection Pooling','PgBouncer','N+1 Query Problem','Database Partitioning','Table Partitioning','Read Replicas','Streaming Replication','Database Backups','Database Recovery'] },
+        { title: 'Go PostgreSQL Stack', items: ['pgx','database/sql','sqlc','GORM','Goose','Atlas','Flyway'] }
+      ]
+    },
+    {
+      id: 's9',
+      title: '9 — Redis',
+      topics: [
+        { title: 'Redis', items: ['Redis Strings','Redis Lists','Redis Sets','Redis Sorted Sets','Redis Hashes','Redis Streams','Redis Pub/Sub','Redis Transactions','Redis Pipelines','Redis Lua Scripts','Redis TTL','Redis Expiration','Redis Eviction Policies','Redis Persistence','RDB','AOF','Redis Replication','Redis Sentinel','Redis Cluster','Distributed Locks','Rate Limiting','Session Storage','Cache'] }
+      ]
+    },
+    {
+      id: 's10',
+      title: '10 — Caching',
+      topics: [
+        { title: 'Caching', items: ['Cache-Aside','Read-Through Cache','Write-Through Cache','Write-Behind Cache','Cache Invalidation','TTL','LRU','LFU','Cache Stampede','Cache Penetration','Cache Avalanche','Distributed Cache','Local Cache','CDN Cache','Browser Cache','HTTP Cache','Cache Versioning'] },
+        { title: 'Technologies', items: ['Redis','Memcached','Cloudflare CDN','AWS CloudFront'] }
+      ]
+    },
+    {
+      id: 's11',
+      title: '11 — Message Brokers',
+      topics: [
+        { title: 'Kafka', items: ['Topics','Partitions','Brokers','Producers','Consumers','Consumer Groups','Offsets','Replication','Leader Election','Partition Ordering','Retention','Log Compaction','At-Most-Once Delivery','At-Least-Once Delivery','Exactly-Once Semantics','Consumer Rebalancing','Kafka Connect','Kafka Streams'] },
+        { title: 'RabbitMQ', items: ['Exchanges','Queues','Bindings','Routing Keys','Direct Exchange','Topic Exchange','Fanout Exchange','Headers Exchange','Acknowledgements','Prefetch','Dead Letter Queues','Retry Queues'] },
+        { title: 'Other Messaging Systems', items: ['NATS','NATS JetStream','Amazon SQS','Amazon SNS','Google Pub/Sub'] }
+      ]
+    },
+    {
+      id: 's12',
+      title: '12 — Distributed Systems',
+      topics: [
+        { title: 'Distributed Systems', items: ['CAP Theorem','PACELC','Consistency','Availability','Partition Tolerance','Strong Consistency','Eventual Consistency','Distributed Consensus','Leader Election','Replication','Sharding','Consistent Hashing','Distributed Locks','Clock Synchronization','Network Partitions','Partial Failures','Retries','Timeouts','Idempotency','Duplicate Requests','Exactly-Once Processing','Distributed Transactions','Two-Phase Commit','Saga Pattern','Outbox Pattern','CQRS','Event Sourcing'] }
+      ]
+    },
+    {
+      id: 's13',
+      title: '13 — System Design',
+      topics: [
+        { title: 'Scalability', items: ['Vertical Scaling','Horizontal Scaling','Stateless Services','Load Balancing','Database Scaling','Caching','Sharding','Replication','CDN'] },
+        { title: 'Reliability', items: ['High Availability','Fault Tolerance','Failover','Disaster Recovery','Backup Strategy','Recovery Time Objective','Recovery Point Objective'] },
+        { title: 'Design Problems', items: ['URL Shortener','Rate Limiter','Chat Application','Notification System','Payment System','File Upload System','Video Streaming System','Social Media Feed','Search System','Ride Sharing System','E-commerce System','Hotel Reservation System','Distributed Job Queue','Logging System','Metrics System'] }
+      ]
+    },
+    {
+      id: 's14',
+      title: '14 — Software Architecture',
+      topics: [
+        { title: 'Software Architecture', items: ['Layered Architecture','Clean Architecture','Hexagonal Architecture','Ports and Adapters','Domain-Driven Design','Modular Monolith','Microservices','Service-Oriented Architecture','Event-Driven Architecture'] },
+        { title: 'Design Patterns', items: ['Factory Pattern','Strategy Pattern','Adapter Pattern','Observer Pattern','Decorator Pattern','Builder Pattern','Command Pattern','Repository Pattern','Service Layer Pattern','Dependency Injection','Middleware Pattern'] },
+        { title: 'Distributed Patterns', items: ['Circuit Breaker','Retry Pattern','Timeout Pattern','Bulkhead Pattern','Saga Pattern','Outbox Pattern','CQRS','Event Sourcing'] }
+      ]
+    },
+    {
+      id: 's15',
+      title: '15 — Microservices',
+      topics: [
+        { title: 'Microservices', items: ['Service Boundaries','Database per Service','API Gateway','Service Discovery','Configuration Management','Centralized Logging','Distributed Tracing','Health Checks','Circuit Breakers','Retries','Timeouts','Rate Limiting','Distributed Transactions','Event-Driven Communication','Synchronous Communication','Asynchronous Communication','Backward Compatibility','Contract Testing'] }
+      ]
+    },
+    {
+      id: 's16',
+      title: '16 — Docker',
+      topics: [
+        { title: 'Docker', items: ['Docker Images','Docker Containers','Dockerfile','Docker Compose','Docker Networks','Docker Volumes','Docker Registry','Multi-Stage Builds','Image Optimization','Container Health Checks','Container Security','Container Resource Limits','Container Networking','Docker Hub','Private Registries'] }
+      ]
+    },
+    {
+      id: 's17',
+      title: '17 — Kubernetes',
+      topics: [
+        { title: 'Core Concepts', items: ['Cluster','Node','Pod','Deployment','ReplicaSet','Service','Namespace','ConfigMap','Secret','Ingress','StatefulSet','DaemonSet','Job','CronJob'] },
+        { title: 'Operations', items: ['kubectl','Health Checks','Liveness Probe','Readiness Probe','Startup Probe','Resource Requests','Resource Limits','Horizontal Pod Autoscaling','Rolling Deployments','Rollbacks','Service Discovery','Kubernetes Networking'] },
+        { title: 'Tools', items: ['Helm','Kustomize','Minikube','Kind'] }
+      ]
+    },
+    {
+      id: 's18',
+      title: '18 — AWS Cloud',
+      topics: [
+        { title: 'Compute', items: ['EC2','ECS','EKS','Lambda'] },
+        { title: 'Storage', items: ['S3','EBS','EFS'] },
+        { title: 'Databases', items: ['RDS','Aurora','DynamoDB','ElastiCache'] },
+        { title: 'Networking', items: ['VPC','Subnets','Route Tables','Internet Gateway','NAT Gateway','Security Groups','Network ACLs','Elastic Load Balancer','Application Load Balancer','Network Load Balancer'] },
+        { title: 'Messaging', items: ['SQS','SNS','MSK','EventBridge'] },
+        { title: 'Monitoring', items: ['CloudWatch','CloudTrail'] },
+        { title: 'CDN', items: ['CloudFront'] },
+        { title: 'Security', items: ['IAM','KMS','Secrets Manager','Parameter Store'] }
+      ]
+    },
+    {
+      id: 's19',
+      title: '19 — DevOps and CI/CD',
+      topics: [
+        { title: 'Git', items: ['Git Basics','Branching','Merging','Rebasing','Cherry-pick','Revert','Reset','Stash','Git Hooks','Conventional Commits','Git Flow'] },
+        { title: 'CI/CD', items: ['GitHub Actions','GitLab CI','Jenkins','Build Pipelines','Automated Testing','Automated Deployment','Blue-Green Deployment','Canary Deployment','Rolling Deployment','Rollbacks'] },
+        { title: 'Infrastructure as Code', items: ['Terraform','Ansible','Terraform State','Terraform Modules','Infrastructure Provisioning'] }
+      ]
+    },
+    {
+      id: 's20',
+      title: '20 — Observability',
+      topics: [
+        { title: 'Logging', items: ['Structured Logging','Log Levels','Request IDs','Correlation IDs','Centralized Logging','Log Aggregation'] },
+        { title: 'Metrics', items: ['Counter','Gauge','Histogram','Summary','RED Method','USE Method','SLI','SLO','SLA'] },
+        { title: 'Tracing', items: ['Distributed Tracing','Trace','Span','Context Propagation','Trace Sampling'] },
+        { title: 'Tools', items: ['Prometheus','Grafana','OpenTelemetry','Jaeger','Tempo','Loki','ELK Stack','OpenSearch'] }
+      ]
+    },
+    {
+      id: 's21',
+      title: '21 — Security',
+      topics: [
+        { title: 'Authentication', items: ['Session Authentication','JWT','OAuth 2.0','OpenID Connect','SAML','API Keys','Basic Authentication'] },
+        { title: 'Cryptography', items: ['Hashing','Encryption','Symmetric Encryption','Asymmetric Encryption','Public Key Cryptography','Digital Signatures','TLS','Certificates'] },
+        { title: 'Password Security', items: ['bcrypt','Argon2','Password Hashing','Salt'] },
+        { title: 'Web Security', items: ['SQL Injection','XSS','CSRF','SSRF','CORS','Clickjacking','Session Hijacking','Brute Force Protection','Rate Limiting'] },
+        { title: 'Security Tools', items: ['Keycloak','HashiCorp Vault','AWS Secrets Manager','AWS IAM'] }
+      ]
+    },
+    {
+      id: 's22',
+      title: '22 — Testing',
+      topics: [
+        { title: 'Unit Testing', items: ['Go Testing Package','Test Tables','Test Fixtures','Test Helpers','Mocks','Stubs','Fakes','Test Coverage'] },
+        { title: 'Integration Testing', items: ['Database Integration Tests','Redis Integration Tests','Kafka Integration Tests','API Integration Tests','Testcontainers'] },
+        { title: 'End-to-End Testing', items: ['E2E Testing','API E2E Testing','User Flow Testing'] },
+        { title: 'Testing Tools', items: ['Testify','GoMock','Mockery','Testcontainers','Postman','Newman','k6'] }
+      ]
+    },
+    {
+      id: 's23',
+      title: '23 — Performance Engineering',
+      topics: [
+        { title: 'Performance Engineering', items: ['CPU Profiling','Memory Profiling','Goroutine Profiling','Benchmarking','Load Testing','Stress Testing','Soak Testing','Capacity Planning','Latency Analysis','Throughput Analysis','Memory Leaks','Goroutine Leaks','Connection Pool Tuning','Database Query Optimization','Cache Optimization','Network Optimization'] },
+        { title: 'Tools', items: ['Go pprof','perf','k6','Apache JMeter','Locust'] }
+      ]
+    },
+    {
+      id: 's24',
+      title: '24 — Search and Analytics',
+      topics: [
+        { title: 'Elasticsearch / OpenSearch', items: ['Indexes','Documents','Mappings','Inverted Index','Full-Text Search','Queries','Aggregations','Sharding','Replication'] },
+        { title: 'Other Databases', items: ['MongoDB','Cassandra','DynamoDB','ClickHouse','Neo4j'] }
+      ]
+    },
+    {
+      id: 's25',
+      title: '25 — Professional Senior Engineer Skills',
+      topics: [
+        { title: 'Code Quality', items: ['SOLID Principles','Clean Code','Code Reviews','Refactoring','Technical Debt','Design Documentation','ADRs','API Design','Backward Compatibility'] },
+        { title: 'Engineering Practices', items: ['Requirements Analysis','Technical Estimation','System Design','Trade-off Analysis','Incident Response','Root Cause Analysis','Postmortems','Production Debugging','Technical Leadership','Mentoring'] }
+      ]
+    },
+    {
+      id: 's26',
+      title: '26 — Recommended Go Backend Stack',
+      topics: [
+        { title: 'Core', items: ['Go','Linux','Git'] },
+        { title: 'API', items: ['net/http','Chi','REST','gRPC','WebSockets'] },
+        { title: 'Database', items: ['PostgreSQL','pgx','sqlc','Goose'] },
+        { title: 'Cache', items: ['Redis'] },
+        { title: 'Messaging', items: ['Kafka','RabbitMQ'] },
+        { title: 'Infrastructure', items: ['Docker','Kubernetes','Helm'] },
+        { title: 'Cloud', items: ['AWS','EC2','S3','RDS','ECS/EKS','VPC','IAM','CloudFront'] },
+        { title: 'CI/CD', items: ['GitHub Actions','Terraform'] },
+        { title: 'Observability', items: ['Prometheus','Grafana','OpenTelemetry'] }
+      ]
+    },
+    {
+      id: 's27',
+      title: '27 — Practical Projects',
+      topics: [
+        { title: 'Project 1 — Production REST API', items: ['Build Go REST API','PostgreSQL','Redis','Authentication','JWT','Pagination','Filtering','Rate Limiting','Unit Tests','Integration Tests','Docker','CI/CD','Deploy to AWS','Add Monitoring'] },
+        { title: 'Project 2 — Distributed Notification System', items: ['Go API','Kafka','Worker Services','Retry Mechanism','Dead Letter Queue','Idempotency','Redis','PostgreSQL','Distributed Tracing','Metrics','Docker','Kubernetes'] },
+        { title: 'Project 3 — Distributed Job Queue', items: ['Job Producer','Job Consumer','Worker Pool','Retry','Dead Letter Queue','Job Scheduling','Priority Queue','Redis','PostgreSQL','Kafka or RabbitMQ','Monitoring'] },
+        { title: 'Project 4 — High-Scale URL Shortener', items: ['REST API','PostgreSQL','Redis','Distributed ID Generation','Caching','Rate Limiting','Load Balancing','Horizontal Scaling','Docker','Kubernetes','Monitoring'] },
+        { title: 'Project 5 — Real-Time Chat System', items: ['WebSockets','Go','Redis','Kafka','PostgreSQL','Presence System','Message Delivery','Offline Messages','Message Ordering','Horizontal Scaling'] }
+      ]
+    },
+    {
+      id: 's28',
+      title: '28 — Final Senior Engineer Checklist',
+      topics: [
+        { title: 'Final Checklist', items: ['I can write production-quality Go','I understand Go concurrency deeply','I can design REST APIs','I can design gRPC services','I understand TCP, HTTP, DNS, and TLS','I can design PostgreSQL schemas','I can optimize slow SQL queries','I understand Redis deeply','I understand Kafka or another message broker','I understand distributed systems','I can design scalable systems','I can build microservices','I can use Docker','I can deploy applications to Kubernetes','I can deploy applications to AWS','I can build CI/CD pipelines','I can monitor production systems','I can debug production incidents','I understand security fundamentals','I write unit and integration tests','I can perform performance optimization','I can review code','I can make architectural trade-offs','I can mentor other engineers','I can lead technical projects'] }
+      ]
+    }
+  ];
+
+  // Resource links mapped to section IDs (from resource-url.md)
+  const resources = {
+    's1': [
+      { group: 'Core Go', links: [
+        { title: 'Go by Example', url: 'https://gobyexample.com/' },
+        { title: 'Effective Go (official)', url: 'https://go.dev/doc/effective_go' },
+        { title: 'Learning Go — Jon Bodner', url: null, book: true },
+        { title: 'Go Concurrency Patterns — Rob Pike', url: 'https://www.youtube.com/watch?v=f6kdp27TYZs' }
+      ]},
+      { group: 'Advanced / Performance', links: [
+        { title: 'Ardan Labs Go Training', url: 'https://github.com/ardanlabs/gotraining' },
+        { title: "Julia Evans' Blog", url: 'https://jvns.ca/' },
+        { title: "Dave Cheney's Blog", url: 'https://dave.cheney.net/' },
+        { title: 'Go pprof Official Blog Post', url: 'https://go.dev/blog/pprof' }
+      ]}
+    ],
+    's8': [
+      { group: 'PostgreSQL + pgx + sqlc', links: [
+        { title: 'sqlc Documentation', url: 'https://docs.sqlc.dev/' },
+        { title: 'pgx (GitHub)', url: 'https://github.com/jackc/pgx' },
+        { title: 'Use The Index, Luke', url: 'https://use-the-index-luke.com/' }
+      ]}
+    ],
+    's9': [
+      { group: 'Redis', links: [
+        { title: 'Redis University (free courses)', url: 'https://university.redis.com/' }
+      ]}
+    ],
+    's22': [
+      { group: 'Testing', links: [
+        { title: 'testcontainers-go Documentation', url: 'https://golang.testcontainers.org/' },
+        { title: 'Testify (GitHub)', url: 'https://github.com/stretchr/testify' }
+      ]}
+    ],
+    's16': [
+      { group: 'Docker', links: [
+        { title: 'Docker Multi-Stage Builds Guide', url: 'https://docs.docker.com/build/building/multi-stage/' }
+      ]}
+    ],
+    's4': [
+      { group: 'Linux', links: [
+        { title: 'Wizard Zines — Julia Evans', url: 'https://wizardzines.com/' },
+        { title: 'Brendan Gregg — Linux Performance', url: 'https://www.brendangregg.com/linuxperf.html' }
+      ]}
+    ],
+    's19': [
+      { group: 'CI/CD', links: [
+        { title: 'GitHub Actions Documentation', url: 'https://docs.github.com/en/actions' },
+        { title: 'GitHub Actions for Go — Example Workflows', url: 'https://github.com/mvdan/github-actions-golang' }
+      ]},
+      { group: 'Infrastructure as Code', links: [] }
+    ],
+    's18': [
+      { group: 'AWS', links: [
+        { title: 'AWS Skill Builder (free tier)', url: 'https://skillbuilder.aws/' },
+        { title: 'AWS Architecture Center', url: 'https://aws.amazon.com/architecture/' }
+      ]}
+    ],
+    's20': [
+      { group: 'Observability', links: [
+        { title: 'Prometheus Documentation', url: 'https://prometheus.io/docs/introduction/overview/' },
+        { title: 'Grafana Tutorials', url: 'https://grafana.com/tutorials/' },
+        { title: 'OpenTelemetry — Go Docs', url: 'https://opentelemetry.io/docs/languages/go/' }
+      ]}
+    ],
+    's11': [
+      { group: 'Kafka', links: [
+        { title: 'Confluent Developer — Free Kafka Courses', url: 'https://developer.confluent.io/courses/' },
+        { title: 'Kafka: The Definitive Guide', url: null, book: true }
+      ]}
+    ],
+    's12': [
+      { group: 'Distributed Systems', links: [
+        { title: 'MIT 6.824 Distributed Systems (free, labs in Go)', url: 'https://pdos.csail.mit.edu/6.824/' },
+        { title: 'Designing Data-Intensive Applications — Kleppmann', url: null, book: true }
+      ]}
+    ],
+    's13': [
+      { group: 'System Design', links: [
+        { title: 'systemdesign.one', url: 'https://systemdesign.one/' },
+        { title: 'ByteByteGo (YouTube)', url: 'https://www.youtube.com/@ByteByteGo' },
+        { title: 'Excalidraw (for diagramming)', url: 'https://excalidraw.com/' }
+      ]}
+    ],
+    's15': [
+      { group: 'Microservices', links: [
+        { title: 'microservices.io — Chris Richardson', url: 'https://microservices.io/' }
+      ]}
+    ],
+    's17': [
+      { group: 'Kubernetes', links: [
+        { title: 'Kubernetes Official Tutorials', url: 'https://kubernetes.io/docs/tutorials/' },
+        { title: 'Killercoda — Free Interactive K8s', url: 'https://killercoda.com/' }
+      ]}
+    ],
+    's23': [
+      { group: 'Performance Engineering', links: [
+        { title: 'Go pprof Guide', url: 'https://go.dev/blog/pprof' },
+        { title: 'Systems Performance — Brendan Gregg', url: null, book: true }
+      ]}
+    ],
+    's24': [
+      { group: 'Distributed Databases', links: [
+        { title: 'CMU Database Group Lectures (YouTube)', url: 'https://www.youtube.com/@cmudatabasegroup' }
+      ]},
+      { group: 'Load Testing', links: [
+        { title: 'k6 Documentation', url: 'https://k6.io/docs/' }
+      ]}
+    ]
+  };
+
+  const STORAGE_KEY = 'notebound-checklist-progress';
+  let checked = {};
+  try { checked = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { checked = {}; }
+
+  let openSections = {};
+
+  function itemKey(sectionId, topicIdx, itemIdx){
+    return sectionId + '__' + topicIdx + '__' + itemIdx;
+  }
+
+  function countSection(section){
+    let total = 0, done = 0;
+    section.topics.forEach((t, ti) => {
+      t.items.forEach((it, ii) => {
+        total++;
+        if(checked[itemKey(section.id, ti, ii)]) done++;
+      });
+    });
+    return { total, done };
+  }
+
+  function countAll(){
+    let total = 0, done = 0;
+    data.forEach(s => { const c = countSection(s); total += c.total; done += c.done; });
+    return { total, done };
+  }
+
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(checked));
+  }
+
+  function render(){
+    const container = document.getElementById('sections');
+    container.innerHTML = '';
+
+    data.forEach(section => {
+      const { total, done } = countSection(section);
+      const isOpen = !!openSections[section.id];
+
+      const sectionEl = document.createElement('div');
+      sectionEl.className = 'section' + (isOpen ? ' open' : '');
+
+      const head = document.createElement('button');
+      head.className = 'section-head';
+      head.innerHTML = `
+        <span class="section-title"><span class="tab">${section.title.split('—')[0].trim()}</span> ${section.title.split('—')[1] ? section.title.split('—')[1].trim() : ''}</span>
+        <span style="display:flex; align-items:center;">
+          <span class="section-progress${done===total ? ' complete' : ''}">${done} / ${total}</span>
+          <span class="chevron">▸</span>
+        </span>
+      `;
+      head.onclick = () => { openSections[section.id] = !isOpen; render(); };
+
+      const topicsEl = document.createElement('div');
+      topicsEl.className = 'topics';
+
+      section.topics.forEach((topic, ti) => {
+        const topicEl = document.createElement('div');
+        topicEl.className = 'topic';
+        const topicTitle = document.createElement('p');
+        topicTitle.className = 'topic-title';
+        topicTitle.textContent = topic.title;
+        topicEl.appendChild(topicTitle);
+
+        const ul = document.createElement('ul');
+        ul.className = 'item-list';
+        topic.items.forEach((itemText, ii) => {
+          const key = itemKey(section.id, ti, ii);
+          const isDone = !!checked[key];
+
+          const li = document.createElement('li');
+          li.className = 'item';
+
+          const box = document.createElement('button');
+          box.className = 'check-box' + (isDone ? ' done' : '');
+          box.setAttribute('aria-label', isDone ? 'Mark not done' : 'Mark done');
+          box.onclick = () => { checked[key] = !isDone; save(); render(); };
+
+          const span = document.createElement('span');
+          span.className = 'item-text' + (isDone ? ' done' : '');
+          span.textContent = itemText;
+          span.onclick = () => { checked[key] = !isDone; save(); render(); };
+
+          li.appendChild(box);
+          li.appendChild(span);
+          ul.appendChild(li);
+        });
+        topicEl.appendChild(ul);
+        topicsEl.appendChild(topicEl);
+      });
+
+      // Render resource links if section has resources
+      const sectionResources = resources[section.id];
+      if(sectionResources && sectionResources.length > 0){
+        const resBlock = document.createElement('div');
+        resBlock.className = 'resources-block';
+
+        const resHeading = document.createElement('p');
+        resHeading.className = 'resources-heading';
+        resHeading.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Learning Resources`;
+        resBlock.appendChild(resHeading);
+
+        sectionResources.forEach(group => {
+          if(group.links.length === 0) return;
+          const groupTitle = document.createElement('p');
+          groupTitle.className = 'resource-group-title';
+          groupTitle.textContent = group.group;
+          resBlock.appendChild(groupTitle);
+
+          const linkList = document.createElement('ul');
+          linkList.className = 'resource-links';
+          group.links.forEach(link => {
+            const li = document.createElement('li');
+            if(link.url){
+              const a = document.createElement('a');
+              a.className = 'resource-link';
+              a.href = link.url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.innerHTML = `${link.title} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+              li.appendChild(a);
+            } else {
+              const span = document.createElement('span');
+              span.className = 'resource-link';
+              span.innerHTML = `${link.title} <span class="book-tag">BOOK</span>`;
+              li.appendChild(span);
+            }
+            linkList.appendChild(li);
+          });
+          resBlock.appendChild(linkList);
+        });
+
+        topicsEl.appendChild(resBlock);
+      }
+
+      // (topics forEach already closed above)
+
+
+      sectionEl.appendChild(head);
+      sectionEl.appendChild(topicsEl);
+      container.appendChild(sectionEl);
+    });
+
+    const overall = countAll();
+    document.getElementById('overall').innerHTML = `<b>${overall.done} of ${overall.total}</b> topics crossed off across ${data.length} chapters`;
+  }
+
+  // open the first section by default
+  if(data.length) openSections[data[0].id] = true;
+  render();
+})();
+</script>
+</body>
+</html>
