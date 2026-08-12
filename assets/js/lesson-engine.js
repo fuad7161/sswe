@@ -1,3 +1,5 @@
+import { interviewFacts } from './data/interview-facts.js';
+
 const chapterGuides = {
   s1: {
     summary: 'Go’s language model: small syntax, explicit errors, composition, concurrency, and runtime behavior.',
@@ -90,27 +92,76 @@ function naturalize(value) {
 }
 
 function explanationFor(item, topic, chapter) {
+  if (interviewFacts[item]) return interviewFacts[item][0];
   if (exactExplanations[item]) return exactExplanations[item];
   const hint = topicHints.find(([pattern]) => pattern.test(item))?.[1];
-  const base = `${naturalize(item)} is a focused concept within ${topic.toLowerCase()} and ${chapter.toLowerCase()}.`;
-  return hint ? `${base} ${hint}` : `${base} Study its guarantees, failure modes, operational cost, and how it interacts with neighboring components.`;
+  if (hint) return `${naturalize(item)} is used in ${topic.toLowerCase()}. ${hint}`;
+  return `${naturalize(item)} is a ${topic.toLowerCase()} concept used in ${chapter.toLowerCase()}.`;
 }
 
-function itemGuidance(item, topic) {
-  return [
-    `Use ${item} when its guarantees directly match the ${topic.toLowerCase()} problem you can describe and measure.`,
-    `Prefer the simplest implementation first; add ${item} only after defining correctness, scale, and failure requirements.`,
-    `Test the happy path, boundary conditions, and one realistic failure mode.`
-  ];
-}
+const interviewProfiles = [
+  [/Variables|constants|data types|Strings|runes|Arrays|Slices|Maps|Structs|Pointers/i, ['Domain models, request DTOs, and in-memory state.', 'Choosing value semantics, allocation behavior, and safe mutation.'], ['Static types catch invalid operations at compile time.', 'Zero values reduce initialization code.'], ['Aliasing and unintended mutation can create subtle bugs.', 'Conversions and memory layout still require explicit decisions.']],
+  [/error|Panic|Recover/i, ['Classifying failures at API and storage boundaries.', 'Adding operation context while preserving the original cause.'], ['Errors remain explicit in normal control flow.', 'Wrapping preserves machine-readable causes.'], ['Verbose handling can obscure the happy path.', 'Poorly designed error types couple callers to internals.']],
+  [/Goroutine|channel|select|Mutex|WaitGroup|atomic|race|deadlock|livelock|starvation|worker|Fan-|Pipeline/i, ['Parallel I/O, bounded worker pools, and cancellation.', 'Protecting shared state in concurrent services.'], ['Lightweight concurrency can improve throughput.', 'Synchronization primitives provide memory visibility guarantees.'], ['Leaks, races, and deadlocks are easy to introduce.', 'More concurrency can increase contention and tail latency.']],
+  [/Interface|Composition|Embedding|Generics|Reflection|assertion|switches/i, ['Decoupling business logic from infrastructure.', 'Reusable libraries and type-safe algorithms.'], ['Improves substitution and testability when boundaries are small.', 'Compile-time contracts document required behavior.'], ['Excess abstraction adds indirection.', 'Reflection and broad interfaces weaken compile-time safety.']],
+  [/scheduler|GMP|Stack|Heap|Escape|Garbage|allocation|Object lifetime|profiling/i, ['Diagnosing allocation pressure, latency, and goroutine leaks.', 'Explaining runtime behavior during performance reviews.'], ['Runtime automation keeps application code simple.', 'Profiles make optimization evidence-driven.'], ['GC and scheduling consume CPU and memory headroom.', 'Micro-optimization can damage readability without measurable gain.']],
+  [/Binary Search|Sort|BFS|DFS|Dijkstra|Bellman|Floyd|Topological|Dynamic|Greedy|Backtracking|Sliding|Two Pointers|Prefix|Recursion/i, ['Search, routing, dependency ordering, and optimization problems.', 'Selecting an algorithm from input size and graph properties.'], ['Known complexity makes scaling predictable.', 'Standard patterns reduce solution risk.'], ['Incorrect preconditions produce wrong answers.', 'Optimal algorithms may add implementation complexity.']],
+  [/TCP|UDP|DNS|TLS|IP|CIDR|Subnet|NAT|Socket|Port|Firewall|ARP/i, ['Debugging service connectivity and latency.', 'Designing secure, reliable network communication.'], ['Open protocols interoperate across platforms.', 'Layered responsibilities simplify diagnosis.'], ['Packet loss, latency, and partitions are unavoidable.', 'Timeouts and middleboxes create partial failures.']],
+  [/HTTP|ETag|Cache-Control|Cookie|Session|Content Negotiation|Multipart/i, ['Public APIs, browser applications, and content delivery.', 'Caching and conditional requests at network boundaries.'], ['Universal tooling and proxy support.', 'Standard methods and status codes communicate intent.'], ['Incorrect caching or method semantics causes correctness bugs.', 'Headers, versions, and intermediaries add complexity.']],
+  [/REST|Pagination|Filtering|Sorting|Searching|Versioning|Rate Limiting|OpenAPI|Swagger|gRPC|Protocol|Streaming|WebSocket|Webhook|GraphQL/i, ['Stable client contracts and service-to-service APIs.', 'Controlling compatibility, load, and failure behavior.'], ['Clear contracts enable independent clients and services.', 'Schemas can automate validation and documentation.'], ['Compatibility becomes a long-term obligation.', 'Remote calls add latency and partial failure.']],
+  [/Index|Primary Key|Foreign Key|Constraint|Normal|Denormal|SELECT|JOIN|WHERE|GROUP|ORDER|CTE|Window|JSONB/i, ['Transactional queries and relational data modeling.', 'Reducing query latency with workload-driven access paths.'], ['Database constraints protect invariants centrally.', 'Indexes can turn scans into targeted lookups.'], ['Indexes consume storage and slow writes.', 'Poor query or schema design creates lock and latency problems.']],
+  [/ACID|Isolation|Committed|Repeatable|Serializable|MVCC|Locks|Deadlocks|Optimistic|Pessimistic|Transaction/i, ['Money movement, reservations, and invariant-preserving updates.', 'Coordinating concurrent changes safely.'], ['Transactions make multi-step changes atomic.', 'Isolation levels provide explicit concurrency guarantees.'], ['Stronger isolation can reduce concurrency or cause retries.', 'Long transactions retain versions and hold resources.']],
+  [/Redis|Cache|TTL|Eviction|LRU|Stampede|penetration|avalanche|Memcached|CDN/i, ['Hot reads, sessions, counters, and static content.', 'Protecting databases from repeated expensive work.'], ['Reduces latency and origin load.', 'Absorbs bursts when keys and TTLs are well designed.'], ['Invalidation and freshness are difficult.', 'Hot keys, stampedes, and memory pressure can cause outages.']],
+  [/Kafka|Rabbit|Queue|Broker|Consumer|Producer|Partition|Offset|Delivery|SQS|SNS|NATS|Pub/i, ['Asynchronous jobs, event integration, and load buffering.', 'Decoupling producers from independently scaled consumers.'], ['Buffers bursts and isolates component availability.', 'Replay or routing supports multiple consumers.'], ['Duplicates and reordering require explicit handling.', 'Brokers add operational and schema-evolution complexity.']],
+  [/CAP|PACELC|Consensus|Leader|Replication|Sharding|Consistent Hash|Distributed|Consistency|Idempotency|Saga|Outbox|CQRS|Event sourcing/i, ['Multi-node storage and reliable cross-service workflows.', 'Reasoning about retries, partitions, and ambiguous outcomes.'], ['Enables horizontal scale and fault tolerance.', 'Patterns make failure handling explicit.'], ['Consistency, latency, and availability trade off.', 'Testing and operating failure states is difficult.']],
+  [/Docker|Container|Image|Kubernetes|Pod|Deployment|Service|Probe|Helm|Kustomize/i, ['Packaging and operating services consistently.', 'Rolling deployments, health checks, and resource isolation.'], ['Reproducible artifacts and declarative operations.', 'Automated scheduling and recovery.'], ['Adds platform and networking complexity.', 'Bad limits or probes can amplify incidents.']],
+  [/Metric|SLI|SLO|SLA|Trace|Span|Logging|Prometheus|Grafana|OpenTelemetry|Alert/i, ['Detecting incidents and diagnosing cross-service latency.', 'Measuring reliability against user-facing objectives.'], ['Makes runtime behavior measurable.', 'Supports capacity and incident decisions.'], ['Telemetry can be expensive and noisy.', 'High-cardinality dimensions can overload monitoring systems.']],
+  [/JWT|OAuth|OpenID|SAML|Authentication|mTLS|RBAC|Hashing|Encryption|Signature|bcrypt|Argon|Injection|XSS|CSRF|SSRF|CORS/i, ['Protecting identities, data, and service boundaries.', 'Preventing common web and credential attacks.'], ['Layered controls reduce breach likelihood and impact.', 'Standard protocols avoid custom cryptography.'], ['Misconfiguration creates serious vulnerabilities.', 'Security controls add operational and user friction.']],
+  [/Test|Mock|Stub|Fake|Coverage|Fuzz|Benchmark|k6/i, ['Regression protection and safe refactoring.', 'Validating units, integrations, and production-like flows.'], ['Fast repeatable evidence improves delivery safety.', 'Tests document expected behavior.'], ['Brittle tests increase maintenance cost.', 'Mocks and coverage can give false confidence.']]
+];
 
-function itemTradeoffs(item, guide) {
-  const specific = topicHints.find(([pattern]) => pattern.test(item));
-  return {
-    pros: [specific ? specific[1] : `Provides a recognized solution or vocabulary for ${item}.`, ...guide.pros.slice(0, 2)],
-    cons: [`Adds learning, implementation, or operational cost; do not adopt it without a concrete requirement.`, ...guide.cons.slice(0, 2)]
+function profileFor(item, guide) {
+  const match = interviewProfiles.find(([pattern]) => pattern.test(item));
+  return match ? { useCases: match[1], pros: match[2], cons: match[3] } : {
+    useCases: guide.useCases.slice(0, 2), pros: guide.pros.slice(0, 2), cons: guide.cons.slice(0, 2)
   };
 }
+
+const interviewExamples = {
+  'Variables and constants': `const maxRetries = 3\n\nfunc retry(delay time.Duration) {\n  attempts := 0 // inferred as int\n  attempts++\n  fmt.Println(maxRetries, attempts, delay)\n}`,
+  'Strings and runes': `s := "Go語"\nfmt.Println(len(s))         // bytes: 5\nfmt.Println(utf8.RuneCountInString(s)) // runes: 3\nfor i, r := range s {\n  fmt.Printf("byte=%d rune=%q\\n", i, r)\n}`,
+  'Slices': `base := []int{1, 2, 3, 4}\na := base[:2]\nb := append(a, 99) // reuses base: [1 2 99 4]\n_ = b\n\ncopyOfA := append([]int(nil), a...) // independent backing array`,
+  'Maps': `counts := make(map[string]int)\ncounts["go"]++\nvalue, exists := counts["go"]\nfmt.Println(value, exists)\n// Concurrent access requires synchronization.`,
+  'Interfaces': `type Store interface { Get(context.Context, string) ([]byte, error) }\n\nfunc Load(ctx context.Context, s Store, key string) ([]byte, error) {\n  return s.Get(ctx, key)\n}`,
+  'Goroutines': `g, ctx := errgroup.WithContext(ctx)\nfor _, id := range ids {\n  id := id\n  g.Go(func() error { return process(ctx, id) })\n}\nif err := g.Wait(); err != nil { return err }`,
+  'Channels': `jobs := make(chan Job)\ngo func() {\n  defer close(jobs)\n  for _, job := range pending { jobs <- job }\n}()\nfor job := range jobs { process(job) }`,
+  'select': `select {\ncase job := <-jobs:\n  return process(job)\ncase <-ctx.Done():\n  return ctx.Err()\ncase <-time.After(time.Second):\n  return ErrTimeout\n}`,
+  'sync.Mutex': `type Counter struct {\n  mu sync.Mutex\n  n  int\n}\nfunc (c *Counter) Inc() {\n  c.mu.Lock()\n  defer c.mu.Unlock()\n  c.n++\n}`,
+  'context': `ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)\ndefer cancel()\nuser, err := repo.FindUser(ctx, id)`,
+  'Binary Search': `func search(a []int, x int) int {\n  lo, hi := 0, len(a)\n  for lo < hi {\n    mid := lo + (hi-lo)/2\n    if a[mid] < x { lo = mid+1 } else { hi = mid }\n  }\n  if lo < len(a) && a[lo] == x { return lo }\n  return -1\n}`,
+  'TCP Handshake': `Client                         Server\n  | -------- SYN(seq=x) --------> |\n  | <--- SYN-ACK(seq=y,ack=x+1) --|\n  | -------- ACK(ack=y+1) ------> |\n  |       connection ready        |`,
+  'HTTP Methods': `GET    /users/42       # safe, idempotent\nPOST   /users          # create; not inherently idempotent\nPUT    /users/42       # replace; idempotent\nPATCH  /users/42       # partial change\nDELETE /users/42       # idempotent intended effect`,
+  'Idempotency': `INSERT INTO idempotency_keys (key, response)\nVALUES ($1, $2)\nON CONFLICT (key) DO NOTHING;\n-- Create payment and key in one transaction; return stored response on retry.`,
+  'Cursor Pagination': `SELECT id, created_at, title\nFROM posts\nWHERE (created_at, id) < ($1, $2)\nORDER BY created_at DESC, id DESC\nLIMIT 20;`,
+  'B-Tree Index': `CREATE INDEX users_email_idx ON users (email);\n\nEXPLAIN (ANALYZE, BUFFERS)\nSELECT id FROM users WHERE email = 'ada@example.com';`,
+  'Composite Index': `CREATE INDEX orders_tenant_created_idx\nON orders (tenant_id, created_at DESC);\n\nSELECT * FROM orders\nWHERE tenant_id = $1 AND created_at < $2\nORDER BY created_at DESC LIMIT 50;`,
+  'Read Committed': `BEGIN; -- default PostgreSQL isolation\nSELECT balance FROM accounts WHERE id = 1;\n-- another transaction commits an update\nSELECT balance FROM accounts WHERE id = 1; -- may differ\nCOMMIT;`,
+  'MVCC': `UPDATE users SET name = 'Ada' WHERE id = 42;\n-- PostgreSQL creates a new tuple version. Existing snapshots may\n-- still read the old version; VACUUM later reclaims dead tuples.`,
+  'Cache-aside': `value, err := cache.Get(ctx, key)\nif errors.Is(err, redis.Nil) {\n  value, err = db.Load(ctx, id)\n  if err == nil { _ = cache.Set(ctx, key, value, ttl) }\n}\nreturn value, err`,
+  'Cache Stampede': `value, err, _ := singleflightGroup.Do(key, func() (any, error) {\n  if cached := cache.Get(key); cached != nil { return cached, nil }\n  value, err := db.Load(key)\n  if err == nil { cache.Set(key, value, ttlWithJitter()) }\n  return value, err\n})`,
+  'CAP Theorem': `Network partition between replicas:\n\nCP choice: reject/timeout writes without quorum → consistent, unavailable.\nAP choice: accept writes on both sides → available, reconcile conflicts later.`,
+  'Outbox Pattern': `BEGIN;\nINSERT INTO orders (id, status) VALUES ($1, 'created');\nINSERT INTO outbox (event_id, topic, payload) VALUES ($2, 'orders', $3);\nCOMMIT;\n-- A relay publishes unsent outbox rows and marks them sent.`,
+  'Docker Image': `FROM golang:1.24-alpine AS build\nWORKDIR /src\nCOPY . .\nRUN CGO_ENABLED=0 go build -o /api ./cmd/api\n\nFROM gcr.io/distroless/static-debian12:nonroot\nCOPY --from=build /api /api\nENTRYPOINT ["/api"]`,
+  'SLI': `availability SLI = good requests / valid requests\n\ngood: HTTP status < 500 and latency < 300 ms\nexclude: health checks and known client cancellations`,
+  'SQL Injection': `// Safe: the driver sends the value separately from SQL structure.\nrow := db.QueryRowContext(ctx,\n  "SELECT id FROM users WHERE email = $1", email,\n)\n// Never concatenate email into the query string.`
+};
+
+const interviewExampleLanguages = {
+  'TCP Handshake': 'text', 'HTTP Methods': 'http', 'Idempotency': 'sql',
+  'Cursor Pagination': 'sql', 'B-Tree Index': 'sql', 'Composite Index': 'sql',
+  'Read Committed': 'sql', 'MVCC': 'sql', 'CAP Theorem': 'text',
+  'Outbox Pattern': 'sql', 'Docker Image': 'dockerfile', 'SLI': 'text'
+};
 
 export function getChapterGuide(sectionId) {
   return chapterGuides[sectionId];
@@ -119,24 +170,28 @@ export function getChapterGuide(sectionId) {
 export function buildLesson(section, topic, item) {
   const guide = chapterGuides[section.id];
   const chapter = section.title.split('—').slice(1).join('—').trim();
-  const tradeoffs = itemTradeoffs(item, guide);
+  const profile = profileFor(item, guide);
+  const interview = interviewFacts[item];
+  const isCapability = section.id === 's28' && item.startsWith('I ');
+  const capability = item.replace(/^I (can|understand|write) /, '');
   return {
     item,
     topic: topic.title,
     chapter,
-    explanation: explanationFor(item, topic.title, chapter),
-    mentalModel: `Ask four questions: What guarantee does ${item} provide? What does it cost? How does it fail? How will you observe that failure?`,
-    example: `${guide.language === 'go' ? `// Focus: ${item}\n` : `${guide.language === 'sql' ? '--' : '#'} Focus: ${item}\n`}${guide.example}`,
-    language: guide.language,
-    useCases: itemGuidance(item, topic.title),
-    pros: tradeoffs.pros,
-    cons: tradeoffs.cons,
-    exercise: `Build the smallest working demonstration of ${item}. Record one success case, one edge case, and one failure. Then explain when you would choose a simpler alternative.`
+    explanation: isCapability ? `Senior-level evidence means demonstrating ${capability} through a real decision, implementation, and measured outcome.` : explanationFor(item, topic.title, chapter),
+    question: isCapability ? `What project or incident proves you can ${capability}?` : (interview?.[1] || `What is ${item}, and what production trade-off should an engineer know?`),
+    answer: isCapability ? 'Give the context, constraints, your decision, alternatives rejected, measurable result, and what you would change next time.' : (interview?.[2] || explanationFor(item, topic.title, chapter)),
+    example: interviewExamples[item] || guide.example,
+    language: interviewExampleLanguages[item] || guide.language,
+    useCases: profile.useCases,
+    pros: profile.pros,
+    cons: profile.cons,
+    exercise: `Be ready to define ${item} in two sentences, give one production example, and name its main failure mode.`
   };
 }
 
 export function auditLessons(roadmap) {
-  const required = ['explanation', 'example', 'useCases', 'pros', 'cons', 'exercise'];
+  const required = ['explanation', 'question', 'answer', 'example', 'useCases', 'pros', 'cons'];
   const failures = [];
   for (const section of roadmap) for (const topic of section.topics) for (const item of topic.items) {
     const lesson = buildLesson(section, topic, item);

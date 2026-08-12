@@ -446,7 +446,14 @@ button { color: inherit; }
 .lesson-breadcrumb { color:var(--red-pen); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
 .lesson-breadcrumb span { padding:0 5px; color:var(--rule); }
 .lesson-drawer h2 { margin:9px 42px 10px 0; font-size:28px; line-height:1.2; }
+.content-label { display:block; margin:14px 0 3px; color:var(--red-pen); font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
 .lesson-lead { color:var(--graphite); font-size:14px; line-height:1.8; }
+.interview-question { margin:20px 0; padding:15px 16px; color:#fff8e8; background:var(--graphite); border-radius:9px; }
+.interview-question > span { color:#e5a39d; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.interview-question h3 { margin:7px 0 10px; color:#fff8e8; font-size:13px; line-height:1.55; }
+.interview-question details { padding-top:9px; border-top:1px solid rgba(255,255,255,.14); }
+.interview-question summary { width:max-content; cursor:pointer; color:#e5a39d; font-size:9px; }
+.interview-question details p { margin:9px 0 0; color:#eee6d8; font-size:11px; line-height:1.65; }
 .mental-model { margin:20px 0; padding:14px 16px; color:#fff8e8; background:var(--graphite); border-radius:9px; }
 .mental-model strong { color:#e5a39d; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
 .mental-model p { margin:5px 0 0; font-size:12px; line-height:1.7; }

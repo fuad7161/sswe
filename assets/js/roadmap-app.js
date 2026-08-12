@@ -218,15 +218,15 @@ function openLesson(token, updateHash = true) {
   els.drawerContent.innerHTML = `<nav class="lesson-nav" aria-label="Lesson navigation"><button type="button" data-lesson="${previous.token}">← Previous</button><span>${currentIndex + 1} / ${curriculum.length}</span><button type="button" data-lesson="${next.token}">Next →</button></nav>
     <div class="lesson-breadcrumb">${escapeHTML(lesson.chapter)} <span>›</span> ${escapeHTML(lesson.topic)}</div>
     <h2>${escapeHTML(lesson.item)}</h2>
+    <span class="content-label">Definition</span>
     <p class="lesson-lead">${escapeHTML(lesson.explanation)}</p>
-    <div class="mental-model"><strong>Senior engineer lens</strong><p>${escapeHTML(lesson.mentalModel)}</p></div>
+    <section class="interview-question"><span>Interview question</span><h3>${escapeHTML(lesson.question)}</h3><details><summary>Show expected answer</summary><p>${escapeHTML(lesson.answer)}</p></details></section>
     <section class="lesson-section"><h3>Example</h3><div class="code-head"><span>${escapeHTML(lesson.language)}</span><button type="button" data-copy-code>Copy code</button></div><pre><code>${escapeHTML(lesson.example)}</code></pre></section>
     <section class="lesson-section"><h3>Practical use cases</h3>${list(lesson.useCases)}</section>
     <div class="tradeoff-grid">
       <section class="tradeoff pros"><h3>Advantages</h3>${list(lesson.pros)}</section>
       <section class="tradeoff cons"><h3>Drawbacks</h3>${list(lesson.cons)}</section>
     </div>
-    <section class="lesson-section exercise"><h3>Try it yourself</h3><p>${escapeHTML(lesson.exercise)}</p></section>
     <section class="personal-note"><div><h3>My field notes</h3><span>Saved automatically in this browser</span></div><textarea data-note-key="${key}" placeholder="Write an insight, question, or production example…">${escapeHTML(note)}</textarea></section>
     <section class="related-topics"><h3>Keep exploring</h3><div>${related.map(entry => `<button type="button" data-lesson="${entry.token}">${escapeHTML(entry.item)} →</button>`).join('')}</div></section>
     <button class="master-button${done ? ' mastered' : ''}" type="button" data-drawer-check="${token}">${done ? '✓ Mastered — mark as learning' : 'Mark this topic as mastered'}</button>`;

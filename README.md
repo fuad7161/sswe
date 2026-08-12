@@ -22,6 +22,7 @@ assets/css/resources.css           resource page presentation
 assets/js/roadmap-app.js           search, progress, navigation, lesson drawer
 assets/js/resources-app.js         resource page rendering
 assets/js/lesson-engine.js         explanations, examples and trade-offs
+assets/js/data/interview-facts.js  concise definitions and interview answers
 assets/js/data/roadmap.js          the 28-chapter / 955-topic curriculum
 assets/js/data/resources.js        curated learning resources
 ```
