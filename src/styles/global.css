@@ -1,0 +1,31 @@
+:root {
+    --bg: #F4EFE1;
+    --text: #1A1714;
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+    font-family: Inter, system-ui, Arial, sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text)
+}
+
+a {
+    color: #c4453a
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin: 8px 0
+}
+
+.top-nav {
+    padding: 12px;
+    border-bottom: 1px solid #eee
+}
