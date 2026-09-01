@@ -4,6 +4,9 @@ import { auditLessons, buildLesson, getChapterGuide } from './lesson-engine.js';
 const STORAGE_KEY = 'notebound-checklist-progress';
 const NOTES_KEY = 'notebound-topic-notes';
 const RECENT_KEY = 'notebound-recent-topics';
+const GO_MERGE_MIGRATION_KEY = 'notebound-go-section-merge-v1';
+const LEGACY_GO_STANDARD_LIBRARY_TOPICS = 34;
+migrateMergedGoSection();
 const curriculum = roadmap.flatMap(section => section.topics.flatMap((topic, topicIndex) =>
   topic.items.map((item, itemIndex) => ({
     section, topic, item, topicIndex, itemIndex,
@@ -20,6 +23,33 @@ const state = {
   filter: 'all',
   selected: null
 };
+
+function migrateMergedGoSection() {
+  if (localStorage.getItem(GO_MERGE_MIGRATION_KEY)) return;
+  try {
+    for (const storageKey of [STORAGE_KEY, NOTES_KEY]) {
+      const values = JSON.parse(localStorage.getItem(storageKey)) || {};
+      for (let index = 0; index < LEGACY_GO_STANDARD_LIBRARY_TOPICS; index++) {
+        const oldKey = `s2__0__${index}`;
+        const newKey = `s1__5__${index}`;
+        if (Object.hasOwn(values, oldKey)) {
+          values[newKey] = values[oldKey];
+          delete values[oldKey];
+        }
+      }
+      localStorage.setItem(storageKey, JSON.stringify(values));
+    }
+    const recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    const migratedRecent = recent.map(token => {
+      const match = token.match(/^s2\|0\|(\d+)$/);
+      return match && Number(match[1]) < LEGACY_GO_STANDARD_LIBRARY_TOPICS ? `s1|5|${match[1]}` : token;
+    });
+    localStorage.setItem(RECENT_KEY, JSON.stringify(migratedRecent));
+    localStorage.setItem(GO_MERGE_MIGRATION_KEY, 'done');
+  } catch {
+    // Invalid legacy browser data is handled by the normal storage fallbacks.
+  }
+}
 
 const els = {
   content: document.querySelector('#content'),

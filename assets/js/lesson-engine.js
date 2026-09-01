@@ -10,11 +10,12 @@ const chapterGuides = {
     language: 'go'
   },
   s2: {
-    summary: 'Go’s standard library supplies stable building blocks for HTTP, I/O, data encoding, cryptography, testing, and concurrency.',
-    useCases: ['Build services with few dependencies', 'Create portable utilities', 'Use well-tested security and I/O primitives'],
-    pros: ['Stable APIs and excellent documentation', 'Consistent conventions', 'Ships with the Go toolchain'],
-    cons: ['APIs are often deliberately low-level', 'Specialized packages may offer more features', 'Some operations require careful resource cleanup'],
-    example: `mux := http.NewServeMux()\nmux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {\n  w.Header().Set("Content-Type", "application/json")\n  json.NewEncoder(w).Encode(map[string]string{"status": "ok"})\n})\nlog.Fatal(http.ListenAndServe(":8080", mux))`, language: 'go'
+    summary: 'Interview-focused Java and Spring Boot: language and JVM internals, concurrency, dependency injection, web APIs, persistence, security, testing, and production operations.',
+    useCases: ['Build production Spring Boot APIs and microservices', 'Reason about JVM performance and concurrency', 'Explain framework behavior and data-access trade-offs in interviews'],
+    pros: ['Mature JVM ecosystem and production tooling', 'Spring Boot provides consistent application conventions', 'Strong support for data, security, messaging, and observability'],
+    cons: ['Framework proxies and auto-configuration can hide runtime behavior', 'JPA defaults can cause query and transaction surprises', 'JVM and Spring applications require deliberate memory and startup tuning'],
+    example: `@RestController\n@RequestMapping("/users")\nclass UserController {\n  private final UserService users;\n\n  UserController(UserService users) {\n    this.users = users;\n  }\n\n  @GetMapping("/{id}")\n  UserDto find(@PathVariable long id) {\n    return users.find(id);\n  }\n}`,
+    language: 'java'
   },
   s3: { summary: 'Data structures organize information; algorithms transform it. Complexity predicts how both behave as input grows.', useCases: ['Choose efficient storage and lookup', 'Solve graph and scheduling problems', 'Reason about performance before optimizing'], pros: ['Reusable problem-solving patterns', 'Makes scaling costs visible', 'Improves technical interview and design skills'], cons: ['Asymptotic analysis hides constants', 'The theoretically best choice may be harder to maintain', 'Premature cleverness can reduce clarity'], example: `func binarySearch(a []int, target int) int {\n  lo, hi := 0, len(a)-1\n  for lo <= hi {\n    mid := lo + (hi-lo)/2\n    if a[mid] == target { return mid }\n    if a[mid] < target { lo = mid+1 } else { hi = mid-1 }\n  }\n  return -1\n}`, language: 'go' },
   s4: { summary: 'Operating-system and Linux concepts explain what your program is really doing with CPU, memory, files, and processes.', useCases: ['Debug production hosts', 'Diagnose CPU, memory, and I/O pressure', 'Automate server operations'], pros: ['Essential production intuition', 'Powerful observability and automation tools', 'Knowledge transfers across runtimes'], cons: ['Behavior varies across operating systems', 'Low-level debugging has a steep learning curve', 'Privileged tools can affect production'], example: `# Find the process listening on port 8080\nss -ltnp 'sport = :8080'\n\n# Inspect its open files and system calls\nlsof -p "$PID"\nstrace -p "$PID" -f`, language: 'bash' },
@@ -45,6 +46,21 @@ const chapterGuides = {
 };
 
 const exactExplanations = {
+  'JDK vs JRE vs JVM': 'The JDK provides development tools, the JRE supplies libraries and runtime components, and the JVM executes Java bytecode.',
+  'equals and hashCode contract': 'Objects considered equal must return the same hash code so hash-based collections can locate them consistently.',
+  'HashMap internals': 'HashMap uses a bucket array, spreads key hash codes, and resolves collisions with linked nodes or balanced trees for large buckets.',
+  'Java Memory Model': 'The Java Memory Model defines visibility and ordering guarantees between threads through rules such as happens-before.',
+  'volatile keyword': 'volatile guarantees visibility and ordering for reads and writes of a variable, but does not make compound operations atomic.',
+  'Virtual threads': 'Virtual threads are lightweight JVM-managed threads designed to support large numbers of blocking I/O tasks without large platform-thread pools.',
+  'Inversion of Control': 'Inversion of Control gives object creation and wiring to a container rather than having application objects construct their own dependencies.',
+  'Dependency Injection in Spring': 'Spring supplies an object’s dependencies through configuration; constructor injection makes required dependencies explicit and testable.',
+  'Spring Boot auto-configuration': 'Spring Boot conditionally configures beans from the classpath, existing beans, properties, and application type, while allowing explicit overrides.',
+  'Spring MVC request lifecycle': 'DispatcherServlet routes a request through handler mappings, interceptors, argument resolution, a controller, return-value handling, and exception resolvers.',
+  'JPA persistence context': 'A persistence context is a unit-of-work identity map that tracks managed entities and synchronizes their changes during flush.',
+  'N+1 query problem in JPA': 'The N+1 problem occurs when one query loads parents and additional queries load related data per parent; fetch joins or projections commonly solve it.',
+  '@Transactional': 'Spring applies transaction behavior through an AOP proxy, so propagation, rollback rules, visibility, and self-invocation affect whether it works as expected.',
+  'Spring Security architecture': 'Spring Security authenticates and authorizes requests through an ordered filter chain backed by a SecurityContext and configured authorization rules.',
+  'Testcontainers with Spring Boot': 'Testcontainers starts disposable real infrastructure such as PostgreSQL or Kafka so integration tests exercise production-compatible dependencies.',
   'Goroutines': 'Lightweight functions scheduled cooperatively by the Go runtime over a smaller pool of operating-system threads.',
   'Channels': 'Typed synchronization queues used to communicate values and establish happens-before relationships between goroutines.',
   'Interfaces': 'Implicitly satisfied method sets that let consumers depend on behavior instead of concrete implementations.',
@@ -74,6 +90,8 @@ const exactExplanations = {
 };
 
 const topicHints = [
+  [/spring|bean|dependency injection|inversion of control|dispatcher|controller|jpa|hibernate/i, 'Interview answers should explain what the Spring container or proxy does, when it happens, and which behavior commonly surprises production systems.'],
+  [/jvm|jdk|jre|bytecode|class load|garbage collection|jit|memory model/i, 'Interview answers should connect the JVM mechanism to memory visibility, latency, allocation, or application startup behavior.'],
   [/index|search|lookup|hash|tree|trie/i, 'It improves retrieval or traversal by organizing data around a predictable access path.'],
   [/lock|mutex|atomic|semaphore|race|deadlock/i, 'It controls or explains concurrent access to shared state; correctness depends on ownership and ordering.'],
   [/cache|ttl|eviction|lru/i, 'It manages reuse and freshness so repeated reads avoid more expensive underlying work.'],
@@ -100,6 +118,10 @@ function explanationFor(item, topic, chapter) {
 }
 
 const interviewProfiles = [
+  [/Spring|BeanFactory|ApplicationContext|Bean|Dependency Injection|Inversion of Control|Qualifier|Component|Proxy|CGLIB|AOP|Aspect/i, ['Wiring application boundaries and cross-cutting behavior.', 'Explaining container, bean-lifecycle, and proxy behavior in Spring interviews.'], ['Constructor injection produces explicit, testable dependencies.', 'Container conventions reduce repetitive application wiring.'], ['Proxy boundaries can make annotations behave unexpectedly.', 'Excessive container magic makes control flow harder to trace.']],
+  [/JVM|JDK|JRE|bytecode|Class load|Garbage|G1|ZGC|JIT|Memory Model|happens-before|volatile|OutOfMemory|StackOverflow|reference/i, ['Diagnosing JVM memory, startup, and latency problems.', 'Reasoning about visibility and runtime optimization in interviews.'], ['Managed memory and JIT compilation provide productive performance.', 'Multiple collectors support different latency and throughput goals.'], ['GC pauses and allocation pressure affect tail latency.', 'Runtime tuning without measurements can make behavior worse.']],
+  [/JPA|Hibernate|Entity|Persistence|Dirty checking|Lazy|Eager|N\+1|JPQL|JpaRepository|Cascade|Orphan|Transactional|Hikari|JDBC batching/i, ['Implementing transactional business workflows.', 'Avoiding hidden queries, lock contention, and persistence-context mistakes.'], ['Unit-of-work tracking reduces repetitive persistence code.', 'Declarative transactions make boundaries concise.'], ['Implicit fetching can create severe query amplification.', 'Proxy-based transactions have rollback and self-invocation traps.']],
+  [/HashMap|ArrayList|LinkedList|Collection|TreeMap|TreeSet|Comparator|Iterator|Stream|Lambda|Optional|Generics|Type erasure/i, ['Selecting collections by access pattern and complexity.', 'Writing expressive transformations while controlling allocation and parallelism.'], ['Standard collections are well-tested and interoperable.', 'Generics and streams improve reusable type-safe code.'], ['Incorrect equality contracts break hashed collections.', 'Parallel or chained streams can obscure cost and side effects.']],
   [/Variables|constants|data types|Strings|runes|Arrays|Slices|Maps|Structs|Pointers/i, ['Domain models, request DTOs, and in-memory state.', 'Choosing value semantics, allocation behavior, and safe mutation.'], ['Static types catch invalid operations at compile time.', 'Zero values reduce initialization code.'], ['Aliasing and unintended mutation can create subtle bugs.', 'Conversions and memory layout still require explicit decisions.']],
   [/error|Panic|Recover/i, ['Classifying failures at API and storage boundaries.', 'Adding operation context while preserving the original cause.'], ['Errors remain explicit in normal control flow.', 'Wrapping preserves machine-readable causes.'], ['Verbose handling can obscure the happy path.', 'Poorly designed error types couple callers to internals.']],
   [/Goroutine|channel|select|Mutex|WaitGroup|atomic|race|deadlock|livelock|starvation|worker|Fan-|Pipeline/i, ['Parallel I/O, bounded worker pools, and cancellation.', 'Protecting shared state in concurrent services.'], ['Lightweight concurrency can improve throughput.', 'Synchronization primitives provide memory visibility guarantees.'], ['Leaks, races, and deadlocks are easy to introduce.', 'More concurrency can increase contention and tail latency.']],
